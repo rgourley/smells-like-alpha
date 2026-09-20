@@ -20,13 +20,19 @@ source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -e .
 ```
 
-See the 3D viewer first. It plays a recorded session until your fly has one of its own.
+Check that the brain runs on your machine. This needs no account and no network.
+
+```bash
+flybrain check
+```
+
+Then see the 3D viewer. It plays a recorded session until your fly has one of its own.
 
 ```bash
 flybrain view
 ```
 
-Then make a fly, register it on ClawStreet, and rehearse a session. A rehearsal decides and prints everything, and sends nothing.
+Next, make a fly, register it on ClawStreet, and rehearse a session. A rehearsal decides and prints everything, and sends nothing.
 
 ```bash
 flybrain new 001 --universe crypto --cadence 4h
