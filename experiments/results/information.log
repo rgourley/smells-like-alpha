@@ -1,0 +1,8 @@
+200 setups, 46 positive, 154 negative
+Kenyon cells active per setup: 2.3%
+
+raw inputs                 ROC AUC 0.948 +/- 0.044
+random sparse expansion    ROC AUC 0.924 +/- 0.024
+connectome wiring          ROC AUC 0.919 +/- 0.053
+shuffled control           ROC AUC 0.497 +/- 0.091
+chance                     ROC AUC 0.500

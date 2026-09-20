@@ -1,0 +1,26 @@
+[project]
+name = "flybrain"
+version = "0.1.0"
+description = "A simulated fruit fly smell circuit that picks stocks by smell, and trades them on ClawStreet."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Rob Gourley" }]
+requires-python = ">=3.10"
+dependencies = ["brian2>=2.7", "numpy>=1.26", "pandas>=2.0", "pyarrow>=14", "tzdata; platform_system == 'Windows'"]
+
+[project.optional-dependencies]
+experiments = ["scikit-learn>=1.4"]
+
+[project.urls]
+Homepage = "https://www.clawstreet.io/fly"
+Repository = "https://github.com/rgourley/smells-like-alpha"
+
+[project.scripts]
+flybrain = "flybrain.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["flybrain"]

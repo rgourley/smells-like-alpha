@@ -1,0 +1,1842 @@
+{
+ "units": "micrometres, recentred",
+ "source": "gs://flyem-male-cns/rois (MaleCNS v1.0, CC BY 4.0)",
+ "meshes": [
+  {
+   "name": "AL-D(R)",
+   "group": "glomerulus",
+   "offset": 0,
+   "vertices": 346,
+   "triangles": 700,
+   "centre": [
+    -54.97,
+    -44.92,
+    -135.15
+   ]
+  },
+  {
+   "name": "AL-DA1(R)",
+   "group": "glomerulus",
+   "offset": 12552,
+   "vertices": 350,
+   "triangles": 700,
+   "centre": [
+    -95.17,
+    -32.26,
+    -134.3
+   ]
+  },
+  {
+   "name": "AL-DA2(R)",
+   "group": "glomerulus",
+   "offset": 25152,
+   "vertices": 347,
+   "triangles": 699,
+   "centre": [
+    -47.39,
+    -31.17,
+    -145.78
+   ]
+  },
+  {
+   "name": "AL-DA3(R)",
+   "group": "glomerulus",
+   "offset": 37704,
+   "vertices": 350,
+   "triangles": 699,
+   "centre": [
+    -72.36,
+    -39.13,
+    -142.27
+   ]
+  },
+  {
+   "name": "AL-DA4l(R)",
+   "group": "glomerulus",
+   "offset": 50292,
+   "vertices": 348,
+   "triangles": 699,
+   "centre": [
+    -64.5,
+    -27.82,
+    -144.46
+   ]
+  },
+  {
+   "name": "AL-DA4m(R)",
+   "group": "glomerulus",
+   "offset": 62856,
+   "vertices": 344,
+   "triangles": 699,
+   "centre": [
+    -58.53,
+    -38.43,
+    -143.69
+   ]
+  },
+  {
+   "name": "AL-DC1(R)",
+   "group": "glomerulus",
+   "offset": 75372,
+   "vertices": 347,
+   "triangles": 700,
+   "centre": [
+    -51.68,
+    -31.27,
+    -132.59
+   ]
+  },
+  {
+   "name": "AL-DC2(R)",
+   "group": "glomerulus",
+   "offset": 87936,
+   "vertices": 347,
+   "triangles": 699,
+   "centre": [
+    -44.55,
+    -16.14,
+    -136.49
+   ]
+  },
+  {
+   "name": "AL-DC3(R)",
+   "group": "glomerulus",
+   "offset": 100488,
+   "vertices": 349,
+   "triangles": 700,
+   "centre": [
+    -67.71,
+    -17.23,
+    -136.74
+   ]
+  },
+  {
+   "name": "AL-DC4(R)",
+   "group": "glomerulus",
+   "offset": 113076,
+   "vertices": 350,
+   "triangles": 700,
+   "centre": [
+    -37.43,
+    -25.03,
+    -123.42
+   ]
+  },
+  {
+   "name": "AL-DL1(R)",
+   "group": "glomerulus",
+   "offset": 125676,
+   "vertices": 349,
+   "triangles": 699,
+   "centre": [
+    -71.12,
+    -43.26,
+    -122.29
+   ]
+  },
+  {
+   "name": "AL-DL2d(R)",
+   "group": "glomerulus",
+   "offset": 138252,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    -83.45,
+    -33.24,
+    -114.47
+   ]
+  },
+  {
+   "name": "AL-DL2v(R)",
+   "group": "glomerulus",
+   "offset": 150828,
+   "vertices": 348,
+   "triangles": 699,
+   "centre": [
+    -75.27,
+    -25.08,
+    -116.56
+   ]
+  },
+  {
+   "name": "AL-DL3(R)",
+   "group": "glomerulus",
+   "offset": 163392,
+   "vertices": 348,
+   "triangles": 699,
+   "centre": [
+    -78.38,
+    -53.95,
+    -132.34
+   ]
+  },
+  {
+   "name": "AL-DL4(R)",
+   "group": "glomerulus",
+   "offset": 175956,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    -72.86,
+    -41.7,
+    -132.95
+   ]
+  },
+  {
+   "name": "AL-DL5(R)",
+   "group": "glomerulus",
+   "offset": 188532,
+   "vertices": 346,
+   "triangles": 699,
+   "centre": [
+    -51.69,
+    -46.85,
+    -120.85
+   ]
+  },
+  {
+   "name": "AL-DM1(R)",
+   "group": "glomerulus",
+   "offset": 201072,
+   "vertices": 351,
+   "triangles": 699,
+   "centre": [
+    -19.97,
+    -35.22,
+    -114.55
+   ]
+  },
+  {
+   "name": "AL-DM2(R)",
+   "group": "glomerulus",
+   "offset": 213672,
+   "vertices": 347,
+   "triangles": 699,
+   "centre": [
+    -17.51,
+    -26.9,
+    -125.1
+   ]
+  },
+  {
+   "name": "AL-DM3(R)",
+   "group": "glomerulus",
+   "offset": 226224,
+   "vertices": 350,
+   "triangles": 699,
+   "centre": [
+    -33.44,
+    -46.34,
+    -121.35
+   ]
+  },
+  {
+   "name": "AL-DM4(R)",
+   "group": "glomerulus",
+   "offset": 238812,
+   "vertices": 343,
+   "triangles": 699,
+   "centre": [
+    -16.83,
+    -30.38,
+    -101.48
+   ]
+  },
+  {
+   "name": "AL-DM5(R)",
+   "group": "glomerulus",
+   "offset": 251316,
+   "vertices": 344,
+   "triangles": 700,
+   "centre": [
+    -26.18,
+    -16.91,
+    -142.69
+   ]
+  },
+  {
+   "name": "AL-DM6(R)",
+   "group": "glomerulus",
+   "offset": 263844,
+   "vertices": 345,
+   "triangles": 697,
+   "centre": [
+    -33.38,
+    -38.28,
+    -134.86
+   ]
+  },
+  {
+   "name": "AL-DP1l(R)",
+   "group": "glomerulus",
+   "offset": 276348,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    -80.45,
+    -22.33,
+    -104.31
+   ]
+  },
+  {
+   "name": "AL-DP1m(R)",
+   "group": "glomerulus",
+   "offset": 288924,
+   "vertices": 349,
+   "triangles": 699,
+   "centre": [
+    -45.35,
+    -33.21,
+    -109.02
+   ]
+  },
+  {
+   "name": "AL-V(R)",
+   "group": "glomerulus",
+   "offset": 301500,
+   "vertices": 348,
+   "triangles": 699,
+   "centre": [
+    -53.81,
+    38.12,
+    -108.02
+   ]
+  },
+  {
+   "name": "AL-VA1d(R)",
+   "group": "glomerulus",
+   "offset": 314064,
+   "vertices": 345,
+   "triangles": 700,
+   "centre": [
+    -85.59,
+    -15.57,
+    -144.21
+   ]
+  },
+  {
+   "name": "AL-VA1v(R)",
+   "group": "glomerulus",
+   "offset": 326604,
+   "vertices": 349,
+   "triangles": 700,
+   "centre": [
+    -84.81,
+    3.44,
+    -134.57
+   ]
+  },
+  {
+   "name": "AL-VA2(R)",
+   "group": "glomerulus",
+   "offset": 339192,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    -33.63,
+    12.26,
+    -142.83
+   ]
+  },
+  {
+   "name": "AL-VA3(R)",
+   "group": "glomerulus",
+   "offset": 351768,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    -49.85,
+    22.46,
+    -140.08
+   ]
+  },
+  {
+   "name": "AL-VA4(R)",
+   "group": "glomerulus",
+   "offset": 364344,
+   "vertices": 347,
+   "triangles": 700,
+   "centre": [
+    -50.31,
+    22.41,
+    -127.86
+   ]
+  },
+  {
+   "name": "AL-VA5(R)",
+   "group": "glomerulus",
+   "offset": 376908,
+   "vertices": 346,
+   "triangles": 700,
+   "centre": [
+    -69.02,
+    19.27,
+    -137.39
+   ]
+  },
+  {
+   "name": "AL-VA6(R)",
+   "group": "glomerulus",
+   "offset": 389460,
+   "vertices": 347,
+   "triangles": 699,
+   "centre": [
+    -55.91,
+    -10.48,
+    -144.11
+   ]
+  },
+  {
+   "name": "AL-VA7l(R)",
+   "group": "glomerulus",
+   "offset": 402012,
+   "vertices": 351,
+   "triangles": 700,
+   "centre": [
+    -60.5,
+    11.25,
+    -142.04
+   ]
+  },
+  {
+   "name": "AL-VA7m(R)",
+   "group": "glomerulus",
+   "offset": 414624,
+   "vertices": 346,
+   "triangles": 699,
+   "centre": [
+    -49.01,
+    7.92,
+    -147.88
+   ]
+  },
+  {
+   "name": "AL-VC1(R)",
+   "group": "glomerulus",
+   "offset": 427164,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    -53.48,
+    5.23,
+    -121.51
+   ]
+  },
+  {
+   "name": "AL-VC2(R)",
+   "group": "glomerulus",
+   "offset": 439740,
+   "vertices": 345,
+   "triangles": 700,
+   "centre": [
+    -53.14,
+    8.55,
+    -132.06
+   ]
+  },
+  {
+   "name": "AL-VC3(R)",
+   "group": "glomerulus",
+   "offset": 452280,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    -32.93,
+    7.04,
+    -119.48
+   ]
+  },
+  {
+   "name": "AL-VC4(R)",
+   "group": "glomerulus",
+   "offset": 464856,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    -35.17,
+    1.03,
+    -130.21
+   ]
+  },
+  {
+   "name": "AL-VC5(R)",
+   "group": "glomerulus",
+   "offset": 477432,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    -26.32,
+    7.91,
+    -111.33
+   ]
+  },
+  {
+   "name": "AL-VL1(R)",
+   "group": "glomerulus",
+   "offset": 490008,
+   "vertices": 345,
+   "triangles": 700,
+   "centre": [
+    -76.74,
+    22.12,
+    -117.34
+   ]
+  },
+  {
+   "name": "AL-VL2a(R)",
+   "group": "glomerulus",
+   "offset": 502548,
+   "vertices": 347,
+   "triangles": 700,
+   "centre": [
+    -96.18,
+    -4.16,
+    -116.44
+   ]
+  },
+  {
+   "name": "AL-VL2p(R)",
+   "group": "glomerulus",
+   "offset": 515112,
+   "vertices": 347,
+   "triangles": 699,
+   "centre": [
+    -91.86,
+    2.34,
+    -102.3
+   ]
+  },
+  {
+   "name": "AL-VM1(R)",
+   "group": "glomerulus",
+   "offset": 527664,
+   "vertices": 343,
+   "triangles": 699,
+   "centre": [
+    -20.52,
+    18.13,
+    -114.11
+   ]
+  },
+  {
+   "name": "AL-VM2(R)",
+   "group": "glomerulus",
+   "offset": 540168,
+   "vertices": 349,
+   "triangles": 700,
+   "centre": [
+    -22.06,
+    0.88,
+    -136.33
+   ]
+  },
+  {
+   "name": "AL-VM3(R)",
+   "group": "glomerulus",
+   "offset": 552756,
+   "vertices": 349,
+   "triangles": 699,
+   "centre": [
+    -22.5,
+    11.42,
+    -128.62
+   ]
+  },
+  {
+   "name": "AL-VM4(R)",
+   "group": "glomerulus",
+   "offset": 565332,
+   "vertices": 347,
+   "triangles": 699,
+   "centre": [
+    -42.25,
+    27.18,
+    -120.26
+   ]
+  },
+  {
+   "name": "AL-VM5d(R)",
+   "group": "glomerulus",
+   "offset": 577884,
+   "vertices": 349,
+   "triangles": 700,
+   "centre": [
+    -30.99,
+    -14.58,
+    -135.02
+   ]
+  },
+  {
+   "name": "AL-VM5v(R)",
+   "group": "glomerulus",
+   "offset": 590472,
+   "vertices": 350,
+   "triangles": 699,
+   "centre": [
+    -40.92,
+    -7.79,
+    -145.36
+   ]
+  },
+  {
+   "name": "AL-VM6(R)",
+   "group": "glomerulus",
+   "offset": 603060,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    -31.61,
+    12.18,
+    -103.13
+   ]
+  },
+  {
+   "name": "AL-VM7d(R)",
+   "group": "glomerulus",
+   "offset": 615636,
+   "vertices": 346,
+   "triangles": 699,
+   "centre": [
+    -22.17,
+    -12.06,
+    -116.64
+   ]
+  },
+  {
+   "name": "AL-VM7v(R)",
+   "group": "glomerulus",
+   "offset": 628176,
+   "vertices": 349,
+   "triangles": 700,
+   "centre": [
+    -34.85,
+    -7.78,
+    -124.24
+   ]
+  },
+  {
+   "name": "AL-VP1d(R)",
+   "group": "glomerulus",
+   "offset": 640764,
+   "vertices": 343,
+   "triangles": 700,
+   "centre": [
+    -57.05,
+    -4.69,
+    -112.61
+   ]
+  },
+  {
+   "name": "AL-VP1l(R)",
+   "group": "glomerulus",
+   "offset": 653280,
+   "vertices": 352,
+   "triangles": 699,
+   "centre": [
+    -62.87,
+    6.09,
+    -96.69
+   ]
+  },
+  {
+   "name": "AL-VP1m(R)",
+   "group": "glomerulus",
+   "offset": 665892,
+   "vertices": 348,
+   "triangles": 699,
+   "centre": [
+    -51.84,
+    9.08,
+    -100.06
+   ]
+  },
+  {
+   "name": "AL-VP2(R)",
+   "group": "glomerulus",
+   "offset": 678456,
+   "vertices": 348,
+   "triangles": 699,
+   "centre": [
+    -41.48,
+    13.18,
+    -94.33
+   ]
+  },
+  {
+   "name": "AL-VP3(R)",
+   "group": "glomerulus",
+   "offset": 691020,
+   "vertices": 344,
+   "triangles": 700,
+   "centre": [
+    -66.67,
+    15.64,
+    -88.97
+   ]
+  },
+  {
+   "name": "AL-VP4(R)",
+   "group": "glomerulus",
+   "offset": 703548,
+   "vertices": 342,
+   "triangles": 699,
+   "centre": [
+    -50.72,
+    -14.45,
+    -95.85
+   ]
+  },
+  {
+   "name": "AL-VP5(R)",
+   "group": "glomerulus",
+   "offset": 716040,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    -53.63,
+    23.23,
+    -95.14
+   ]
+  },
+  {
+   "name": "AL-D(L)",
+   "group": "glomerulus",
+   "offset": 728616,
+   "vertices": 347,
+   "triangles": 699,
+   "centre": [
+    55.26,
+    -62.56,
+    -140.31
+   ]
+  },
+  {
+   "name": "AL-DA1(L)",
+   "group": "glomerulus",
+   "offset": 741168,
+   "vertices": 344,
+   "triangles": 700,
+   "centre": [
+    91.71,
+    -51.84,
+    -148.48
+   ]
+  },
+  {
+   "name": "AL-DA2(L)",
+   "group": "glomerulus",
+   "offset": 753696,
+   "vertices": 348,
+   "triangles": 699,
+   "centre": [
+    50.32,
+    -46.93,
+    -154.54
+   ]
+  },
+  {
+   "name": "AL-DA3(L)",
+   "group": "glomerulus",
+   "offset": 766260,
+   "vertices": 350,
+   "triangles": 699,
+   "centre": [
+    68.87,
+    -61.22,
+    -152.89
+   ]
+  },
+  {
+   "name": "AL-DA4l(L)",
+   "group": "glomerulus",
+   "offset": 778848,
+   "vertices": 347,
+   "triangles": 700,
+   "centre": [
+    65.92,
+    -45.43,
+    -156.01
+   ]
+  },
+  {
+   "name": "AL-DA4m(L)",
+   "group": "glomerulus",
+   "offset": 791412,
+   "vertices": 345,
+   "triangles": 700,
+   "centre": [
+    56.73,
+    -58.5,
+    -151.96
+   ]
+  },
+  {
+   "name": "AL-DC1(L)",
+   "group": "glomerulus",
+   "offset": 803952,
+   "vertices": 350,
+   "triangles": 700,
+   "centre": [
+    59.62,
+    -48.32,
+    -142.18
+   ]
+  },
+  {
+   "name": "AL-DC2(L)",
+   "group": "glomerulus",
+   "offset": 816552,
+   "vertices": 345,
+   "triangles": 700,
+   "centre": [
+    49.8,
+    -35.77,
+    -142.91
+   ]
+  },
+  {
+   "name": "AL-DC3(L)",
+   "group": "glomerulus",
+   "offset": 829092,
+   "vertices": 349,
+   "triangles": 700,
+   "centre": [
+    71.28,
+    -31.22,
+    -147.34
+   ]
+  },
+  {
+   "name": "AL-DC4(L)",
+   "group": "glomerulus",
+   "offset": 841680,
+   "vertices": 351,
+   "triangles": 700,
+   "centre": [
+    47.25,
+    -39.37,
+    -122.88
+   ]
+  },
+  {
+   "name": "AL-DL1(L)",
+   "group": "glomerulus",
+   "offset": 854292,
+   "vertices": 346,
+   "triangles": 699,
+   "centre": [
+    77.16,
+    -56.34,
+    -129.93
+   ]
+  },
+  {
+   "name": "AL-DL2d(L)",
+   "group": "glomerulus",
+   "offset": 866832,
+   "vertices": 349,
+   "triangles": 697,
+   "centre": [
+    94.93,
+    -45.39,
+    -124.33
+   ]
+  },
+  {
+   "name": "AL-DL2v(L)",
+   "group": "glomerulus",
+   "offset": 879384,
+   "vertices": 349,
+   "triangles": 699,
+   "centre": [
+    85.51,
+    -38.43,
+    -122.18
+   ]
+  },
+  {
+   "name": "AL-DL3(L)",
+   "group": "glomerulus",
+   "offset": 891960,
+   "vertices": 347,
+   "triangles": 699,
+   "centre": [
+    82.29,
+    -69.97,
+    -138.77
+   ]
+  },
+  {
+   "name": "AL-DL4(L)",
+   "group": "glomerulus",
+   "offset": 904512,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    70.93,
+    -64.1,
+    -140.96
+   ]
+  },
+  {
+   "name": "AL-DL5(L)",
+   "group": "glomerulus",
+   "offset": 917088,
+   "vertices": 346,
+   "triangles": 699,
+   "centre": [
+    59.89,
+    -55.75,
+    -125.67
+   ]
+  },
+  {
+   "name": "AL-DM1(L)",
+   "group": "glomerulus",
+   "offset": 929628,
+   "vertices": 342,
+   "triangles": 700,
+   "centre": [
+    29.66,
+    -46.15,
+    -117.09
+   ]
+  },
+  {
+   "name": "AL-DM2(L)",
+   "group": "glomerulus",
+   "offset": 942132,
+   "vertices": 346,
+   "triangles": 698,
+   "centre": [
+    31.07,
+    -39.74,
+    -127.62
+   ]
+  },
+  {
+   "name": "AL-DM3(L)",
+   "group": "glomerulus",
+   "offset": 954660,
+   "vertices": 349,
+   "triangles": 700,
+   "centre": [
+    38.78,
+    -59.22,
+    -127.35
+   ]
+  },
+  {
+   "name": "AL-DM4(L)",
+   "group": "glomerulus",
+   "offset": 967248,
+   "vertices": 349,
+   "triangles": 699,
+   "centre": [
+    23.39,
+    -38.86,
+    -101.93
+   ]
+  },
+  {
+   "name": "AL-DM5(L)",
+   "group": "glomerulus",
+   "offset": 979824,
+   "vertices": 350,
+   "triangles": 700,
+   "centre": [
+    33.58,
+    -36.44,
+    -143.3
+   ]
+  },
+  {
+   "name": "AL-DM6(L)",
+   "group": "glomerulus",
+   "offset": 992424,
+   "vertices": 349,
+   "triangles": 700,
+   "centre": [
+    38.0,
+    -51.69,
+    -141.29
+   ]
+  },
+  {
+   "name": "AL-DP1l(L)",
+   "group": "glomerulus",
+   "offset": 1005012,
+   "vertices": 346,
+   "triangles": 699,
+   "centre": [
+    91.53,
+    -34.38,
+    -110.64
+   ]
+  },
+  {
+   "name": "AL-DP1m(L)",
+   "group": "glomerulus",
+   "offset": 1017552,
+   "vertices": 347,
+   "triangles": 700,
+   "centre": [
+    54.98,
+    -44.37,
+    -110.59
+   ]
+  },
+  {
+   "name": "AL-V(L)",
+   "group": "glomerulus",
+   "offset": 1030116,
+   "vertices": 341,
+   "triangles": 697,
+   "centre": [
+    68.12,
+    22.78,
+    -109.74
+   ]
+  },
+  {
+   "name": "AL-VA1d(L)",
+   "group": "glomerulus",
+   "offset": 1042572,
+   "vertices": 339,
+   "triangles": 699,
+   "centre": [
+    81.72,
+    -30.7,
+    -155.31
+   ]
+  },
+  {
+   "name": "AL-VA1v(L)",
+   "group": "glomerulus",
+   "offset": 1055028,
+   "vertices": 352,
+   "triangles": 700,
+   "centre": [
+    91.45,
+    -13.88,
+    -145.23
+   ]
+  },
+  {
+   "name": "AL-VA2(L)",
+   "group": "glomerulus",
+   "offset": 1067652,
+   "vertices": 347,
+   "triangles": 699,
+   "centre": [
+    40.36,
+    -3.0,
+    -146.41
+   ]
+  },
+  {
+   "name": "AL-VA3(L)",
+   "group": "glomerulus",
+   "offset": 1080204,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    58.99,
+    4.33,
+    -145.84
+   ]
+  },
+  {
+   "name": "AL-VA4(L)",
+   "group": "glomerulus",
+   "offset": 1092780,
+   "vertices": 349,
+   "triangles": 699,
+   "centre": [
+    66.14,
+    8.79,
+    -132.75
+   ]
+  },
+  {
+   "name": "AL-VA5(L)",
+   "group": "glomerulus",
+   "offset": 1105356,
+   "vertices": 347,
+   "triangles": 699,
+   "centre": [
+    80.53,
+    3.24,
+    -144.61
+   ]
+  },
+  {
+   "name": "AL-VA6(L)",
+   "group": "glomerulus",
+   "offset": 1117908,
+   "vertices": 346,
+   "triangles": 699,
+   "centre": [
+    58.64,
+    -27.4,
+    -153.51
+   ]
+  },
+  {
+   "name": "AL-VA7l(L)",
+   "group": "glomerulus",
+   "offset": 1130448,
+   "vertices": 347,
+   "triangles": 700,
+   "centre": [
+    66.96,
+    -8.26,
+    -152.02
+   ]
+  },
+  {
+   "name": "AL-VA7m(L)",
+   "group": "glomerulus",
+   "offset": 1143012,
+   "vertices": 350,
+   "triangles": 699,
+   "centre": [
+    55.5,
+    -9.88,
+    -152.62
+   ]
+  },
+  {
+   "name": "AL-VC1(L)",
+   "group": "glomerulus",
+   "offset": 1155600,
+   "vertices": 344,
+   "triangles": 699,
+   "centre": [
+    61.52,
+    -11.98,
+    -128.69
+   ]
+  },
+  {
+   "name": "AL-VC2(L)",
+   "group": "glomerulus",
+   "offset": 1168116,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    64.58,
+    -6.83,
+    -137.93
+   ]
+  },
+  {
+   "name": "AL-VC3(L)",
+   "group": "glomerulus",
+   "offset": 1180692,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    46.03,
+    -5.05,
+    -122.01
+   ]
+  },
+  {
+   "name": "AL-VC4(L)",
+   "group": "glomerulus",
+   "offset": 1193268,
+   "vertices": 350,
+   "triangles": 699,
+   "centre": [
+    43.3,
+    -10.8,
+    -132.13
+   ]
+  },
+  {
+   "name": "AL-VC5(L)",
+   "group": "glomerulus",
+   "offset": 1205856,
+   "vertices": 347,
+   "triangles": 699,
+   "centre": [
+    36.49,
+    0.95,
+    -113.9
+   ]
+  },
+  {
+   "name": "AL-VL1(L)",
+   "group": "glomerulus",
+   "offset": 1218408,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    89.3,
+    4.61,
+    -125.08
+   ]
+  },
+  {
+   "name": "AL-VL2a(L)",
+   "group": "glomerulus",
+   "offset": 1230984,
+   "vertices": 347,
+   "triangles": 699,
+   "centre": [
+    104.87,
+    -21.38,
+    -127.78
+   ]
+  },
+  {
+   "name": "AL-VL2p(L)",
+   "group": "glomerulus",
+   "offset": 1243536,
+   "vertices": 346,
+   "triangles": 700,
+   "centre": [
+    105.19,
+    -12.26,
+    -114.77
+   ]
+  },
+  {
+   "name": "AL-VM1(L)",
+   "group": "glomerulus",
+   "offset": 1256088,
+   "vertices": 347,
+   "triangles": 699,
+   "centre": [
+    30.43,
+    9.67,
+    -114.12
+   ]
+  },
+  {
+   "name": "AL-VM2(L)",
+   "group": "glomerulus",
+   "offset": 1268640,
+   "vertices": 348,
+   "triangles": 700,
+   "centre": [
+    30.78,
+    -14.66,
+    -135.55
+   ]
+  },
+  {
+   "name": "AL-VM3(L)",
+   "group": "glomerulus",
+   "offset": 1281216,
+   "vertices": 349,
+   "triangles": 700,
+   "centre": [
+    32.82,
+    -1.11,
+    -129.81
+   ]
+  },
+  {
+   "name": "AL-VM4(L)",
+   "group": "glomerulus",
+   "offset": 1293804,
+   "vertices": 345,
+   "triangles": 700,
+   "centre": [
+    51.07,
+    11.73,
+    -125.97
+   ]
+  },
+  {
+   "name": "AL-VM5d(L)",
+   "group": "glomerulus",
+   "offset": 1306344,
+   "vertices": 350,
+   "triangles": 700,
+   "centre": [
+    41.6,
+    -26.77,
+    -139.91
+   ]
+  },
+  {
+   "name": "AL-VM5v(L)",
+   "group": "glomerulus",
+   "offset": 1318944,
+   "vertices": 350,
+   "triangles": 700,
+   "centre": [
+    45.52,
+    -23.52,
+    -152.95
+   ]
+  },
+  {
+   "name": "AL-VM6(L)",
+   "group": "glomerulus",
+   "offset": 1331544,
+   "vertices": 346,
+   "triangles": 699,
+   "centre": [
+    42.4,
+    3.13,
+    -106.96
+   ]
+  },
+  {
+   "name": "AL-VM7d(L)",
+   "group": "glomerulus",
+   "offset": 1344084,
+   "vertices": 346,
+   "triangles": 699,
+   "centre": [
+    33.78,
+    -20.89,
+    -116.44
+   ]
+  },
+  {
+   "name": "AL-VM7v(L)",
+   "group": "glomerulus",
+   "offset": 1356624,
+   "vertices": 348,
+   "triangles": 699,
+   "centre": [
+    45.33,
+    -25.33,
+    -128.9
+   ]
+  },
+  {
+   "name": "AL-VP1d(L)",
+   "group": "glomerulus",
+   "offset": 1369188,
+   "vertices": 346,
+   "triangles": 700,
+   "centre": [
+    67.74,
+    -20.0,
+    -118.24
+   ]
+  },
+  {
+   "name": "AL-VP1l(L)",
+   "group": "glomerulus",
+   "offset": 1381740,
+   "vertices": 344,
+   "triangles": 699,
+   "centre": [
+    70.17,
+    -14.31,
+    -104.3
+   ]
+  },
+  {
+   "name": "AL-VP1m(L)",
+   "group": "glomerulus",
+   "offset": 1394256,
+   "vertices": 347,
+   "triangles": 700,
+   "centre": [
+    62.21,
+    -4.1,
+    -104.09
+   ]
+  },
+  {
+   "name": "AL-VP2(L)",
+   "group": "glomerulus",
+   "offset": 1406820,
+   "vertices": 348,
+   "triangles": 699,
+   "centre": [
+    49.79,
+    0.8,
+    -97.73
+   ]
+  },
+  {
+   "name": "AL-VP3(L)",
+   "group": "glomerulus",
+   "offset": 1419384,
+   "vertices": 345,
+   "triangles": 700,
+   "centre": [
+    76.38,
+    4.16,
+    -93.7
+   ]
+  },
+  {
+   "name": "AL-VP4(L)",
+   "group": "glomerulus",
+   "offset": 1431924,
+   "vertices": 345,
+   "triangles": 698,
+   "centre": [
+    57.33,
+    -26.99,
+    -99.06
+   ]
+  },
+  {
+   "name": "AL-VP5(L)",
+   "group": "glomerulus",
+   "offset": 1444440,
+   "vertices": 346,
+   "triangles": 700,
+   "centre": [
+    67.13,
+    12.01,
+    -100.59
+   ]
+  },
+  {
+   "name": "a'1(R)",
+   "group": "compartment",
+   "offset": 1456992,
+   "vertices": 581,
+   "triangles": 1200,
+   "centre": [
+    -73.42,
+    -111.28,
+    -110.75
+   ]
+  },
+  {
+   "name": "a'2(R)",
+   "group": "compartment",
+   "offset": 1478364,
+   "vertices": 584,
+   "triangles": 1200,
+   "centre": [
+    -68.54,
+    -128.09,
+    -99.81
+   ]
+  },
+  {
+   "name": "a'3(R)",
+   "group": "compartment",
+   "offset": 1499772,
+   "vertices": 594,
+   "triangles": 1199,
+   "centre": [
+    -79.66,
+    -164.35,
+    -75.57
+   ]
+  },
+  {
+   "name": "a1(R)",
+   "group": "compartment",
+   "offset": 1521288,
+   "vertices": 580,
+   "triangles": 1198,
+   "centre": [
+    -79.47,
+    -87.1,
+    -93.17
+   ]
+  },
+  {
+   "name": "a2(R)",
+   "group": "compartment",
+   "offset": 1542624,
+   "vertices": 589,
+   "triangles": 1200,
+   "centre": [
+    -69.16,
+    -131.95,
+    -86.11
+   ]
+  },
+  {
+   "name": "a3(R)",
+   "group": "compartment",
+   "offset": 1564092,
+   "vertices": 589,
+   "triangles": 1199,
+   "centre": [
+    -67.77,
+    -170.01,
+    -78.97
+   ]
+  },
+  {
+   "name": "b'1(R)",
+   "group": "compartment",
+   "offset": 1585548,
+   "vertices": 591,
+   "triangles": 1197,
+   "centre": [
+    -61.71,
+    -92.57,
+    -112.58
+   ]
+  },
+  {
+   "name": "b'2(R)",
+   "group": "compartment",
+   "offset": 1607004,
+   "vertices": 593,
+   "triangles": 1199,
+   "centre": [
+    -19.85,
+    -93.55,
+    -105.37
+   ]
+  },
+  {
+   "name": "b1(R)",
+   "group": "compartment",
+   "offset": 1628508,
+   "vertices": 585,
+   "triangles": 1199,
+   "centre": [
+    -64.66,
+    -78.28,
+    -112.99
+   ]
+  },
+  {
+   "name": "b2(R)",
+   "group": "compartment",
+   "offset": 1649916,
+   "vertices": 586,
+   "triangles": 1199,
+   "centre": [
+    -21.11,
+    -75.34,
+    -109.11
+   ]
+  },
+  {
+   "name": "g1(R)",
+   "group": "compartment",
+   "offset": 1671336,
+   "vertices": 588,
+   "triangles": 1200,
+   "centre": [
+    -94.52,
+    -75.41,
+    -95.04
+   ]
+  },
+  {
+   "name": "g2(R)",
+   "group": "compartment",
+   "offset": 1692792,
+   "vertices": 590,
+   "triangles": 1199,
+   "centre": [
+    -74.57,
+    -91.88,
+    -126.03
+   ]
+  },
+  {
+   "name": "g3(R)",
+   "group": "compartment",
+   "offset": 1714260,
+   "vertices": 588,
+   "triangles": 1197,
+   "centre": [
+    -47.71,
+    -93.72,
+    -130.73
+   ]
+  },
+  {
+   "name": "g4(R)",
+   "group": "compartment",
+   "offset": 1735680,
+   "vertices": 591,
+   "triangles": 1199,
+   "centre": [
+    -21.77,
+    -104.13,
+    -124.45
+   ]
+  },
+  {
+   "name": "g5(R)",
+   "group": "compartment",
+   "offset": 1757160,
+   "vertices": 589,
+   "triangles": 1199,
+   "centre": [
+    -8.64,
+    -94.87,
+    -128.63
+   ]
+  },
+  {
+   "name": "a'1(L)",
+   "group": "compartment",
+   "offset": 1778616,
+   "vertices": 591,
+   "triangles": 1200,
+   "centre": [
+    81.46,
+    -113.92,
+    -115.54
+   ]
+  },
+  {
+   "name": "a'2(L)",
+   "group": "compartment",
+   "offset": 1800108,
+   "vertices": 591,
+   "triangles": 1200,
+   "centre": [
+    73.19,
+    -129.74,
+    -101.17
+   ]
+  },
+  {
+   "name": "a'3(L)",
+   "group": "compartment",
+   "offset": 1821600,
+   "vertices": 593,
+   "triangles": 1200,
+   "centre": [
+    78.31,
+    -167.71,
+    -73.8
+   ]
+  },
+  {
+   "name": "a1(L)",
+   "group": "compartment",
+   "offset": 1843116,
+   "vertices": 586,
+   "triangles": 1200,
+   "centre": [
+    87.47,
+    -97.14,
+    -96.63
+   ]
+  },
+  {
+   "name": "a2(L)",
+   "group": "compartment",
+   "offset": 1864548,
+   "vertices": 595,
+   "triangles": 1199,
+   "centre": [
+    73.04,
+    -138.4,
+    -85.36
+   ]
+  },
+  {
+   "name": "a3(L)",
+   "group": "compartment",
+   "offset": 1886076,
+   "vertices": 594,
+   "triangles": 1200,
+   "centre": [
+    65.73,
+    -173.76,
+    -76.71
+   ]
+  },
+  {
+   "name": "b'1(L)",
+   "group": "compartment",
+   "offset": 1907604,
+   "vertices": 594,
+   "triangles": 1198,
+   "centre": [
+    69.28,
+    -99.49,
+    -118.8
+   ]
+  },
+  {
+   "name": "b'2(L)",
+   "group": "compartment",
+   "offset": 1929108,
+   "vertices": 583,
+   "triangles": 1200,
+   "centre": [
+    25.37,
+    -93.61,
+    -106.02
+   ]
+  },
+  {
+   "name": "b1(L)",
+   "group": "compartment",
+   "offset": 1950504,
+   "vertices": 590,
+   "triangles": 1199,
+   "centre": [
+    72.39,
+    -86.04,
+    -118.9
+   ]
+  },
+  {
+   "name": "b2(L)",
+   "group": "compartment",
+   "offset": 1971972,
+   "vertices": 595,
+   "triangles": 1198,
+   "centre": [
+    29.35,
+    -79.05,
+    -111.05
+   ]
+  },
+  {
+   "name": "g1(L)",
+   "group": "compartment",
+   "offset": 1993488,
+   "vertices": 590,
+   "triangles": 1199,
+   "centre": [
+    102.15,
+    -85.0,
+    -97.76
+   ]
+  },
+  {
+   "name": "g2(L)",
+   "group": "compartment",
+   "offset": 2014956,
+   "vertices": 577,
+   "triangles": 1200,
+   "centre": [
+    79.61,
+    -100.24,
+    -131.25
+   ]
+  },
+  {
+   "name": "g3(L)",
+   "group": "compartment",
+   "offset": 2036280,
+   "vertices": 590,
+   "triangles": 1200,
+   "centre": [
+    54.24,
+    -100.32,
+    -136.79
+   ]
+  },
+  {
+   "name": "g4(L)",
+   "group": "compartment",
+   "offset": 2057760,
+   "vertices": 587,
+   "triangles": 1200,
+   "centre": [
+    27.59,
+    -105.7,
+    -125.86
+   ]
+  },
+  {
+   "name": "g5(L)",
+   "group": "compartment",
+   "offset": 2079204,
+   "vertices": 590,
+   "triangles": 1199,
+   "centre": [
+    15.06,
+    -94.76,
+    -131.67
+   ]
+  },
+  {
+   "name": "CA(R)",
+   "group": "calyx",
+   "offset": 2100672,
+   "vertices": 1226,
+   "triangles": 2499,
+   "centre": [
+    -84.13,
+    -126.79,
+    22.62
+   ]
+  },
+  {
+   "name": "CA(L)",
+   "group": "calyx",
+   "offset": 2145372,
+   "vertices": 1226,
+   "triangles": 2500,
+   "centre": [
+    88.62,
+    -134.78,
+    16.77
+   ]
+  },
+  {
+   "name": "PED(R)",
+   "group": "pedunculus",
+   "offset": 2190084,
+   "vertices": 769,
+   "triangles": 1598,
+   "centre": [
+    -90.72,
+    -84.47,
+    -39.59
+   ]
+  },
+  {
+   "name": "PED(L)",
+   "group": "pedunculus",
+   "offset": 2218488,
+   "vertices": 779,
+   "triangles": 1600,
+   "centre": [
+    99.91,
+    -93.97,
+    -42.1
+   ]
+  },
+  {
+   "name": "LH(R)",
+   "group": "context",
+   "offset": 2247036,
+   "vertices": 595,
+   "triangles": 1199,
+   "centre": [
+    -159.16,
+    -117.19,
+    -9.8
+   ]
+  },
+  {
+   "name": "LH(L)",
+   "group": "context",
+   "offset": 2268564,
+   "vertices": 590,
+   "triangles": 1197,
+   "centre": [
+    165.13,
+    -128.59,
+    -15.8
+   ]
+  },
+  {
+   "name": "brain-shell",
+   "group": "shell",
+   "offset": 2290008,
+   "vertices": 5919,
+   "triangles": 11995,
+   "centre": [
+    1.4,
+    2.44,
+    -9.5
+   ]
+  }
+ ]
+}

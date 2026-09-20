@@ -1,0 +1,8 @@
+learning rate 0.05, recovery 0.02 per session
+
+dead flat                            no recovery    initial verdict +3.78  losses 7
+dead flat                            with recovery  initial verdict +3.78  losses 8
+overbought breakout                  no recovery    initial verdict +5.12  losses 9
+overbought breakout                  with recovery  initial verdict +5.12  losses 11
+oversold, heavy volume, near lows    no recovery    initial verdict +2.35  losses 10
+oversold, heavy volume, near lows    with recovery  initial verdict +2.35  losses 11

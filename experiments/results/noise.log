@@ -1,0 +1,20 @@
+a symbol recovering from oversold to overbought
+  day 0, bought here   verdict +2.627  change from purchase +0.000
+  day 2, bouncing      verdict +2.092  change from purchase -0.535
+  day 5, recovered     verdict +2.168  change from purchase -0.459
+  day 9, extended      verdict +3.027  change from purchase +0.400
+  day 12, overbought   verdict +5.508  change from purchase +2.881
+
+the same setup, unchanged, on five days
+  day 0  verdict +2.571
+  day 1  verdict +2.745
+  day 2  verdict +2.681
+  day 3  verdict +2.592
+  day 4  verdict +2.696
+
+range across five unchanged days: 0.174
+
+single presentations of an unchanged setup, 40 each
+  oversold, heavy volume, near lows    one presentation: s.d. 0.28, mean change 0.35  |  mean of five: s.d. 0.14, mean change 0.16
+  dead flat                            one presentation: s.d. 0.17, mean change 0.20  |  mean of five: s.d. 0.06, mean change 0.06
+  overbought breakout                  one presentation: s.d. 0.79, mean change 0.83  |  mean of five: s.d. 0.35, mean change 0.44

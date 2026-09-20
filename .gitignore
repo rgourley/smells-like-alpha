@@ -1,0 +1,8 @@
+# Each fly's memory, positions, replays and config stay on this machine.
+flies/
+.env
+.venv/
+__pycache__/
+*.egg-info/
+# Brian2's compiled code, when FLYBRAIN_CODEGEN=cython
+output/
