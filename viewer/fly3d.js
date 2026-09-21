@@ -103,13 +103,14 @@ window.Fly3D = function (opts) {
     uniforms: {focus: {value: 3}, px: {value: 600}, radius: {value: radius}, tint: {value: new THREE.Color(0xfff1d6)}},
     vertexShader: `
       uniform float focus; uniform float px; uniform float radius;
+      attribute float fade;
       varying float vSoft; varying float vLight;
       void main() {
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         float d = max(-mv.z, 0.05);
         float r = radius + 0.032 * abs(d - focus);             // cm
         vSoft = clamp((r - radius) / (radius * 6.0), 0.0, 1.0);
-        vLight = clamp(pow(radius / r, 1.05), 0.055, 1.0) * 0.85;
+        vLight = clamp(pow(radius / r, 1.05), 0.055, 1.0) * 0.85 * fade;
         gl_PointSize = min(2.0 * r * px / d, 120.0);
         gl_Position = projectionMatrix * mv;
       }`,
@@ -128,46 +129,35 @@ window.Fly3D = function (opts) {
     const px = h / (2 * Math.tan(camera.fov * Math.PI / 360)), focus = camera.position.distanceTo(fly.position);
     for (const m of materials) { m.uniforms.px.value = px; m.uniforms.focus.value = focus; } };
 
-  // Dust in the light: a few hundred motes drifting slowly above the table.
-  const motes = (() => {
-    const n = 500, pos = new Float32Array(n * 3), vel = [];
-    for (let i = 0; i < n; i++) { pos[i * 3] = rnd(-70, 70); pos[i * 3 + 1] = rnd(0.2, 40); pos[i * 3 + 2] = rnd(-45, 45); vel.push([rnd(-0.4, 0.4), rnd(-0.15, 0.25), rnd(-0.4, 0.4)]); }
-    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    // A point is drawn as a square unless it has a texture. This one is a soft disc that fades to
-    // nothing at the rim, so a mote near the lens reads as an out-of-focus blur, not a box.
-    const soft = (() => {
-      const c = document.createElement("canvas"); c.width = c.height = 64; const x = c.getContext("2d");
-      const grad = x.createRadialGradient(32, 32, 0, 32, 32, 32);
-      grad.addColorStop(0, "rgba(255,255,255,.9)"); grad.addColorStop(0.25, "rgba(255,255,255,.45)"); grad.addColorStop(0.6, "rgba(255,255,255,.12)"); grad.addColorStop(1, "rgba(255,255,255,0)");
-      x.fillStyle = grad; x.fillRect(0, 0, 64, 64);
-      return new THREE.CanvasTexture(c);
-    })();
-    soft.dispose();
-    const m = new THREE.Points(g, moteMaterial(0.07)); m.frustumCulled = false;
-    scene.add(m);
-    return {material: m.material, step(dt, t) { const a = g.attributes.position.array; for (let i = 0; i < n; i++) { const v = vel[i]; a[i * 3] += (v[0] + Math.sin(t * 0.7 + i) * 0.3) * dt; a[i * 3 + 1] += (v[1] + Math.cos(t * 0.5 + i * 1.3) * 0.2) * dt; a[i * 3 + 2] += (v[2] + Math.cos(t * 0.6 + i) * 0.3) * dt; if (a[i * 3 + 1] < 0.1 || a[i * 3 + 1] > 42) a[i * 3 + 1] = rnd(0.2, 40); if (Math.abs(a[i * 3]) > 72) a[i * 3] = -a[i * 3] * 0.98; if (Math.abs(a[i * 3 + 2]) > 46) a[i * 3 + 2] = -a[i * 3 + 2] * 0.98; } g.attributes.position.needsUpdate = true; }};
-  })();
-
-  // The room's motes are a meter apart on average, so a camera a few centimeters from the fly almost
-  // never has one in frame. A few stay in a small box around the fly and wrap as it moves: enough to
-  // catch the light now and then, not enough to read as a haze.
-  const nearMotes = (() => {
-    const n = 42, R = 7, pos = new Float32Array(n * 3), vel = [];
-    for (let i = 0; i < n; i++) { pos[i * 3] = rnd(-R, R); pos[i * 3 + 1] = rnd(0.05, 4.5); pos[i * 3 + 2] = rnd(-R, R); vel.push([rnd(-0.12, 0.12), rnd(-0.05, 0.08), rnd(-0.12, 0.12)]); }
-    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    const dot = (() => { const c = document.createElement("canvas"); c.width = c.height = 32; const x = c.getContext("2d"), gr = x.createRadialGradient(16, 16, 0, 16, 16, 16);
-      gr.addColorStop(0, "rgba(255,255,255,.95)"); gr.addColorStop(0.35, "rgba(255,255,255,.35)"); gr.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = gr; x.fillRect(0, 0, 32, 32); return new THREE.CanvasTexture(c); })();
-    dot.dispose();
-    const m = new THREE.Points(g, moteMaterial(0.022)); m.frustumCulled = false; scene.add(m);
-    const wrap = (v, lo, hi) => v < lo ? v + (hi - lo) : v > hi ? v - (hi - lo) : v;
-    return {material: m.material, step(dt, t, center) { const a = g.attributes.position.array;
-      for (let i = 0; i < n; i++) { const v = vel[i];
-        a[i * 3] = wrap(a[i * 3] + (v[0] + Math.sin(t * 0.6 + i) * 0.05) * dt, -R, R);
-        a[i * 3 + 1] = wrap(a[i * 3 + 1] + (v[1] + Math.cos(t * 0.4 + i * 1.7) * 0.04) * dt, 0.05, 4.5);
-        a[i * 3 + 2] = wrap(a[i * 3 + 2] + (v[2] + Math.cos(t * 0.5 + i) * 0.05) * dt, -R, R); }
-      g.attributes.position.needsUpdate = true; m.position.set(center.x, 0, center.z); },
+  // One layer of dust. A mote drifts on a slow current, brightens, fades out, and comes back
+  // somewhere else in the box a few seconds later, so none pops in or out of view.
+  function dustLayer(n, box, radius, speed) {
+    const pos = new Float32Array(n * 3), fade = new Float32Array(n), life = new Float32Array(n), period = new Float32Array(n), vel = [];
+    const place = i => { pos[i * 3] = rnd(-box.x, box.x); pos[i * 3 + 1] = rnd(box.y0, box.y1); pos[i * 3 + 2] = rnd(-box.z, box.z);
+      vel[i] = [rnd(-1, 1) * speed, rnd(-0.35, 0.6) * speed, rnd(-1, 1) * speed]; period[i] = rnd(6, 14); };
+    for (let i = 0; i < n; i++) { place(i); life[i] = Math.random(); const f = Math.sin(Math.PI * life[i]); fade[i] = f * f; }   // with reduced motion the dust stays as it starts
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setAttribute("fade", new THREE.BufferAttribute(fade, 1));
+    const m = new THREE.Points(g, moteMaterial(radius)); m.frustumCulled = false; scene.add(m);
+    return {material: m.material,
+      step(dt, t, center) {
+        for (let i = 0; i < n; i++) {
+          life[i] += dt / period[i]; if (life[i] >= 1) { life[i] -= 1; place(i); }
+          const v = vel[i], swirl = speed * 0.6;
+          pos[i * 3] += (v[0] + Math.sin(t * 0.6 + i) * swirl) * dt;
+          pos[i * 3 + 1] += (v[1] + Math.cos(t * 0.4 + i * 1.7) * swirl * 0.5) * dt;
+          pos[i * 3 + 2] += (v[2] + Math.cos(t * 0.5 + i) * swirl) * dt;
+          const f = Math.sin(Math.PI * life[i]); fade[i] = f * f;
+        }
+        g.attributes.position.needsUpdate = true; g.attributes.fade.needsUpdate = true;
+        if (center) m.position.set(center.x, 0, center.z);
+      },
       dispose() { g.dispose(); m.material.dispose(); }};
-  })();
+  }
+  // The room's dust, and a sparse layer that stays with the fly: the room's motes are about a meter
+  // apart, so a camera a few centimeters from the fly almost never has one of them in frame.
+  const motes = dustLayer(500, {x: 70, y0: 0.2, y1: 40, z: 45}, 0.07, 0.45);
+  const nearMotes = dustLayer(42, {x: 7, y0: 0.05, y1: 4.5, z: 7}, 0.022, 0.3);
 
   let PLACE = null;   // where the place card stands, for the fly to climb
   // A folded place card at the front left of the table: the market data comes from Massive. 7.5 cm wide and
@@ -636,7 +626,7 @@ window.Fly3D = function (opts) {
     const level = brainM.userData.level || 0;
     brainM.opacity = act.sniff || act.feeding ? level * 0.45 * (0.55 + 0.45 * Math.abs(Math.sin(t * 6))) : 0;
     sun.position.copy(fly.position).add(tmp.set(18, 40, 12)); sun.target.position.copy(fly.position);
-    if (!reduce) { motes.step(dt, t); nearMotes.step(dt, t, fly.position); focusMotes(motes.material, nearMotes.material); }
+    if (!reduce) { motes.step(dt, t, null); nearMotes.step(dt, t, fly.position); focusMotes(motes.material, nearMotes.material); }
     updateCamera(dt, moving);
     renderer.render(scene, camera);
   }
@@ -657,7 +647,7 @@ window.Fly3D = function (opts) {
   // Free everything the GPU holds. A full page load does this anyway; a single-page app moving to
   // another route does not, and that is where a 3D view leaks.
   function dispose() {
-    nearMotes.dispose();
+    nearMotes.dispose(); motes.dispose();
     alive = false; cancelAnimationFrame(raf); watcher.disconnect(); document.removeEventListener("visibilitychange", wake);
     scene.traverse(o => {
       if (o.geometry) o.geometry.dispose();
