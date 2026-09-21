@@ -24,22 +24,19 @@ import numpy as np
 
 from .brain import Brain
 from .config import FlyConfig, home
-from .memory import NOISE_FLOOR, FlyMemory, OpenPosition, from_connectome
+from .memory import FlyMemory, OpenPosition, from_connectome
+from .settings import Settings, settings_for
 from .smell import channel_map, describe, individual_gains, smell, to_rates
 
 PRESENTATION_MS = 50.0
 # The receptor spikes are random, so one presentation is a noisy reading. The
-# fly smells each symbol this many times. The verdict is the mean. The cells it
-# remembers are the ones that fired in most of the presentations. A fly can
-# set its own number with "presentations" in fly.json. More is steadier and slower.
-PRESENTATIONS = 5
-MAX_POSITIONS = 6
-BOARD_SIZE = 8
-# Spikes are not dollars. These settings are ours. A position is a share of
-# the account, set by the verdict against FULL_VERDICT. The untrained fly's
-# strongest verdicts, for an overbought breakout, are between 5 and 6.5.
-MAX_FRACTION = 0.15
-FULL_VERDICT = 6.0
+# fly smells each symbol several times. The verdict is the mean. The cells it
+# remembers are the ones that fired in most of the presentations.
+#
+# Spikes are not dollars. A position is a share of the account, set by the
+# verdict against full_verdict. The untrained fly's strongest verdicts, for an
+# overbought breakout, are between 5 and 6.5. flybrain/settings.py has every
+# number a fly can set.
 
 Reading = dict[str, float | str | None]
 
@@ -62,6 +59,10 @@ class SessionResult(TypedDict):
     held: list[str]
     pick_cells: int
     replay: Path | None
+    # Why the session placed no order: "full", "no_cash" or "nothing_new". None when it placed one.
+    no_order: str | None
+    max_positions: int
+    noise_floor: float
 
 
 @dataclass(frozen=True)
@@ -94,11 +95,11 @@ def bars_from_history(entry: dict, n: int = 20) -> list[list[float]]:
     return [[float(a), float(b), float(d), float(e)] for a, b, d, e in list(zip(o, h, l, c))[-n:]]
 
 
-def compose_board(held: set[str], universe: list[str], seed: int, size: int = BOARD_SIZE) -> list[str]:
+def compose_board(held: set[str], universe: list[str], seed: int, size: int) -> list[str]:
     """Holdings keep their places. The other places go to symbols drawn from the universe.
 
     A holding must be on the board so the fly smells it again and can sell
-    it. MAX_POSITIONS is below the board size, so new symbols arrive every session.
+    it. max_positions is below the board size, so new symbols arrive every session.
     """
     rng = np.random.default_rng(seed)
     fresh = [s for s in universe if s not in held]
@@ -106,17 +107,18 @@ def compose_board(held: set[str], universe: list[str], seed: int, size: int = BO
     return sorted(held) + [str(s) for s in picks]
 
 
-def size_order(verdict: float, runner_up: float, account: float) -> float:
+def size_order(verdict: float, runner_up: float, account: float, cash: float, settings: Settings) -> float:
     """Dollars to spend, from the verdict.
 
-    The verdict against FULL_VERDICT sets the share of the account, up to
-    MAX_FRACTION. When the margin over the next symbol is below NOISE_FLOOR,
-    the fly could not tell them apart, and the amount is halved.
+    The verdict against full_verdict sets the share of the account, up to
+    max_fraction. When the margin over the next symbol is below noise_floor,
+    the fly could not tell them apart, and the amount is halved. The fly never
+    borrows: the amount is capped at the cash in the account.
     """
-    dollars = account * MAX_FRACTION * min(1.0, max(verdict, 0.0) / FULL_VERDICT)
-    if verdict - runner_up < NOISE_FLOOR:
+    dollars = account * settings["max_fraction"] * min(1.0, max(verdict, 0.0) / settings["full_verdict"])
+    if verdict - runner_up < settings["noise_floor"]:
         dollars /= 2
-    return float(round(dollars, 2))
+    return float(round(min(dollars, max(cash, 0.0)), 2))
 
 
 def write_replay(fly_id: str, when: datetime, dry: bool, events: list[dict]) -> Path:
@@ -140,8 +142,10 @@ def write_replay(fly_id: str, when: datetime, dry: bool, events: list[dict]) -> 
 
 
 def run_session(fly_id: str, config: FlyConfig, board: dict[str, dict], closed: dict[str, bool],
-                account: float, when: datetime, live: bool, record: bool) -> SessionResult:
+                account: float, cash: float, when: datetime, live: bool, record: bool) -> SessionResult:
     """One decision. `closed` maps a symbol to whether its trade made money.
+
+    `account` is the equity a position is sized against. `cash` is what is free to spend.
 
     `live` False is a rehearsal: the fly decides and nothing changes on disk,
     except the replay when `record` is True.
@@ -149,8 +153,9 @@ def run_session(fly_id: str, config: FlyConfig, board: dict[str, dict], closed: 
     events: list[dict] = []
     add = lambda kind, **fields: events.append({"step": len(events), "type": kind, **fields})
 
+    settings = settings_for(config)
     brain = Brain()
-    memory = from_connectome(brain.circuit, home(fly_id))
+    memory = from_connectome(brain.circuit, home(fly_id), settings["learning_rate"], settings["recovery"], settings["noise_floor"])
     memory.load()
     add("start", session=memory.sessions + 1, held=sorted(memory.held()), drift=round(memory.drift(), 5),
         universe=config["universe"], cadence=config["cadence"])
@@ -171,7 +176,7 @@ def run_session(fly_id: str, config: FlyConfig, board: dict[str, dict], closed: 
     channels = channel_map(brain.circuit)
     gains = individual_gains(config["individuality"]["seed"], config["individuality"]["sigma"])
     seed = int(when.strftime("%y%m%d%H%M")) % (2**32 - 1000)   # the session minute, as a 32-bit seed
-    looks = config.get("presentations", PRESENTATIONS)
+    looks = settings["presentations"]
     held = memory.held()
     candidates: list[Candidate] = []
     for i, (symbol, entry) in enumerate(board.items()):
@@ -208,9 +213,12 @@ def run_session(fly_id: str, config: FlyConfig, board: dict[str, dict], closed: 
     runner_up = eligible[1].verdict if len(eligible) > 1 else 0.0
 
     order: Order | None = None
-    if pick and len(memory.held()) < MAX_POSITIONS:
-        dollars = size_order(pick.verdict, runner_up, account)
-        if dollars > 0:
+    no_order: str | None = "nothing_new" if not pick else "full" if len(memory.held()) >= settings["max_positions"] else None
+    if pick and no_order is None:
+        dollars = size_order(pick.verdict, runner_up, account, cash, settings)
+        # An order under 1% of the account is not worth its commission.
+        no_order = "no_cash" if dollars < account * 0.01 else None
+        if no_order is None:
             order = {"symbol": pick.symbol, "dollars": dollars, "verdict": round(pick.verdict, 3),
                      "margin": round(pick.verdict - runner_up, 3)}
             add("buy", **order, smell=describe(pick.activations))
@@ -239,6 +247,9 @@ def run_session(fly_id: str, config: FlyConfig, board: dict[str, dict], closed: 
         "held": sorted(memory.held()),
         "pick_cells": int(pick.cells.sum()) if pick else 0,
         "replay": replay,
+        "no_order": None if order else no_order,
+        "max_positions": settings["max_positions"],
+        "noise_floor": settings["noise_floor"],
     }
 
 

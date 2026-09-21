@@ -60,10 +60,27 @@ A crypto fly with `--cadence 4h` decides at 00:00, 04:00, 08:00, 12:00, 16:00 an
 1. **Settle.** Each trade that closed since last time sends its result to the learning cells that fired when the fly chose it. A profit makes that setup smell better. A loss makes it smell worse. Each result moves those connections by 5%.
 2. **Forget.** Every connection moves 2% back toward the value the connectome gave it, so a lesson fades unless new trades confirm it.
 3. **Smell.** The board is eight symbols: what the fly holds, plus symbols drawn at random. Six readings per symbol (RSI, position in the Bollinger band, distance from the 50-day average, volume against its average, five-day return, RSI trend) are spread across 51 smell channels. The fly never sees a ticker, so two symbols in the same technical state smell the same.
-4. **Decide.** The circuit runs on each smell for 50 milliseconds, and about 2% of the 4,064 learning cells fire. Each is wired partly to the brain's approach side and partly to its avoid side. Approach minus avoid is the verdict. The receptor spikes are random, so the fly smells each symbol five times and uses the mean. `"presentations"` in `fly.json` changes the number: more is steadier and slower.
+4. **Decide.** The circuit runs on each smell for 50 milliseconds, and about 2% of the 4,064 learning cells fire. Each is wired partly to the brain's approach side and partly to its avoid side. Approach minus avoid is the verdict. The receptor spikes are random, so the fly smells each symbol five times and uses the mean.
 5. **Trade.** The fly buys the best verdict it does not hold, up to six positions. Size is `equity × 0.15 × min(1, verdict / 6.0)`, halved when first and second place are closer than 0.36. It sells a holding whose verdict has been more than 0.36 below its purchase verdict for two sessions in a row.
 
-The learning rate, the forgetting rate, the 50 ms presentation and the sizing are settings in this repo. Everything else is read from the connectome. The full method and test results are in [the technical write-up](https://www.clawstreet.io/blog/fruit-fly-brain-trading-agent).
+The learning rate, the forgetting rate and the sizing are settings, below. Everything else is read from the connectome. The full method and test results are in [the technical write-up](https://www.clawstreet.io/blog/fruit-fly-brain-trading-agent).
+
+## Settings
+
+Every number that is ours and not the connectome's is a setting, per fly, in `flies/<id>/fly.json`. `flybrain new` writes the defaults there. Change them between sessions. A key left out takes its default, and a key the code does not know stops the run with a message.
+
+| Setting | Default | What it does |
+| --- | ---: | --- |
+| `presentations` | 5 | How many times the fly smells each symbol per session. The verdict is the mean. More is steadier and slower |
+| `board_size` | 8 | How many symbols it looks at per session: what it holds, plus symbols drawn at random |
+| `max_positions` | 6 | The most positions it holds at once. It buys at most one per session, so it stops buying at this number |
+| `max_fraction` | 0.15 | The largest share of the account one position can take |
+| `full_verdict` | 6.0 | The verdict that buys a full-size position. A weaker verdict buys less |
+| `learning_rate` | 0.05 | How far one closed trade moves the connections that chose it |
+| `recovery` | 0.02 | How far every connection moves back toward the connectome each session |
+| `noise_floor` | 0.36 | It sells a holding whose verdict is this far below its purchase verdict two sessions in a row. A pick this close to the runner-up is bought at half size |
+
+The fly never borrows. An order is capped at the cash in the account, so `max_positions` times `max_fraction` can be above 1. `board_size` must be at least `max_positions` plus 2, so new symbols arrive every session. A small universe can be seen whole: ClawStreet lists about 30 crypto symbols, and a `board_size` of 31 shows the fly all of them every session.
 
 ## Market data
 

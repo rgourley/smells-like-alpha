@@ -20,6 +20,7 @@ from .config import FlyConfig, api_key, fly_ids, home, load_fly, save_fly, store
 from .run import after_session, run_once
 from .schedule import due, mark_slot
 from .session import utc_now
+from .settings import DEFAULTS
 from .view import serve
 
 INDIVIDUAL_SIGMA = 0.2
@@ -45,6 +46,8 @@ def new(args: argparse.Namespace) -> None:
         "bot_id": None, "key": f"env:CLAWSTREET_API_KEY_{args.fly.upper()}",
         # The name sets the seed, so the same name always gives the same fly.
         "individuality": {"seed": None if args.published_wiring else zlib.crc32(name.encode()), "sigma": INDIVIDUAL_SIGMA},
+        # The defaults, written out so they are in plain sight. flybrain/settings.py says what each one does.
+        "settings": dict(DEFAULTS),
     }
     save_fly(args.fly, config)
     print(f"made {name} ({ticker}) in {home(args.fly) / 'fly.json'}. Next: flybrain register {args.fly}")

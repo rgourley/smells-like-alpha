@@ -20,7 +20,7 @@ import numpy as np
 
 from .circuit import Circuit, kenyon_cells
 
-# Settings. They are not from the connectome.
+# Defaults. They are not from the connectome. A fly can set its own in fly.json (flybrain/settings.py).
 LEARNING_RATE = 0.05     # how far one result moves the synapses it touches
 DECAY_RATE = 0.02        # how far every synapse drifts back each session
 # The typical change in the verdict between two presentations of an unchanged
@@ -46,8 +46,10 @@ class OpenPosition:
 class FlyMemory:
     """The fly's learned state. It loads at the start of a session and saves at the end."""
 
-    def __init__(self, baseline_reward: np.ndarray, baseline_punish: np.ndarray, home: Path) -> None:
+    def __init__(self, baseline_reward: np.ndarray, baseline_punish: np.ndarray, home: Path,
+                 learning_rate: float = LEARNING_RATE, recovery: float = DECAY_RATE, noise_floor: float = NOISE_FLOOR) -> None:
         self.home = home
+        self.learning_rate, self.recovery, self.noise_floor = learning_rate, recovery, noise_floor
         self.state_path = home / "memory.npz"
         self.positions_path = home / "positions.json"
         self.baseline_reward = baseline_reward
@@ -104,9 +106,9 @@ class FlyMemory:
         if index.size == 0:
             return
         if profitable:
-            self.to_punish[index] *= (1.0 - LEARNING_RATE)
+            self.to_punish[index] *= (1.0 - self.learning_rate)
         else:
-            self.to_reward[index] *= (1.0 - LEARNING_RATE)
+            self.to_reward[index] *= (1.0 - self.learning_rate)
 
     def forget(self) -> None:
         """Move every synapse a little back toward its connectome value.
@@ -114,8 +116,8 @@ class FlyMemory:
         The learning rule only weakens synapses. This recovery keeps them away
         from zero. It also makes a lesson fade unless new trades confirm it.
         """
-        self.to_reward += DECAY_RATE * (self.baseline_reward - self.to_reward)
-        self.to_punish += DECAY_RATE * (self.baseline_punish - self.to_punish)
+        self.to_reward += self.recovery * (self.baseline_reward - self.to_reward)
+        self.to_punish += self.recovery * (self.baseline_punish - self.to_punish)
 
     # ---- positions ---------------------------------------------------
 
@@ -140,12 +142,12 @@ class FlyMemory:
         """Compare a holding with the verdict it was bought on.
 
         Returns True when the verdict has been below the purchase verdict by
-        more than NOISE_FLOOR for two sessions in a row. One low verdict can
+        more than noise_floor for two sessions in a row. One low verdict can
         be noise. Two in a row means the setup changed.
         """
         for p in self.positions:
             if p.symbol == symbol:
-                p.cooling = p.cooling + 1 if verdict_today < p.verdict - NOISE_FLOOR else 0
+                p.cooling = p.cooling + 1 if verdict_today < p.verdict - self.noise_floor else 0
                 return p.cooling >= 2
         return False
 
@@ -166,7 +168,8 @@ class FlyMemory:
         return float(moved.mean())
 
 
-def from_connectome(circuit: Circuit, home: Path) -> FlyMemory:
+def from_connectome(circuit: Circuit, home: Path, learning_rate: float = LEARNING_RATE,
+                    recovery: float = DECAY_RATE, noise_floor: float = NOISE_FLOOR) -> FlyMemory:
     """Build an untrained memory from the wiring.
 
     An output neuron is on the reward side when it gets more synapses from
@@ -185,4 +188,4 @@ def from_connectome(circuit: Circuit, home: Path) -> FlyMemory:
 
     to_reward, to_punish = drive(reward_side), drive(punish_side)
     scale = max(to_reward.max(), to_punish.max(), 1.0)
-    return FlyMemory(to_reward / scale, to_punish / scale, home)
+    return FlyMemory(to_reward / scale, to_punish / scale, home, learning_rate, recovery, noise_floor)

@@ -2,7 +2,7 @@
 
 Each fly has a folder, flies/<id>/, that git ignores:
 
-  fly.json         name, ticker, universe, cadence, bot_id, key, individuality, presentations, after_session
+  fly.json         name, ticker, universe, cadence, bot_id, key, individuality, settings, after_session
   memory.npz       its synapses
   positions.json   what it holds and what it has sold
   replays/         one file per session, and index.json
@@ -37,7 +37,7 @@ class FlyConfig(TypedDict, total=False):
     bot_id: str | None
     key: str                 # "env:NAME" or "keychain:ITEM"
     individuality: Individuality
-    presentations: int       # how many times the fly smells each symbol per session. The default is 5
+    settings: dict[str, float]   # see flybrain/settings.py. A key left out takes its default
     after_session: list[str]  # a command to run after each session; "{replay}" becomes the replay path
     equity: float
     return_pct: float | None

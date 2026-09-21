@@ -6,8 +6,8 @@ import time
 
 from . import clawstreet, massive
 from .config import FlyConfig, api_key, home, save_fly
-from .memory import NOISE_FLOOR
-from .session import BOARD_SIZE, MAX_POSITIONS, SessionResult, compose_board, run_session, utc_now
+from .session import SessionResult, compose_board, run_session, utc_now
+from .settings import settings_for
 
 # The pick is quoted again right before the order, and the order is sized from
 # that quote. If the price moved further than this since the fly smelled it,
@@ -40,7 +40,7 @@ def thought(result: SessionResult, board_size: int, qty: float | None, price: fl
         owned = set(result["held"]) - {order["symbol"]}
         others = [r for r in ranking if r[0] != order["symbol"] and r[0] not in owned and r[0] not in result["sold"]]
         kept = [r for r in ranking if r[0] in owned and r[1] > order["verdict"]]
-        close = order["margin"] < NOISE_FLOOR
+        close = order["margin"] < result["noise_floor"]
         head = f"Smelled {board_size} {things}. {short(order['symbol'])} came out best at {order['verdict']:.2f}"
         if others:
             head += f", {short(others[0][0])} next at {others[0][1]:.2f}"
@@ -55,7 +55,8 @@ def thought(result: SessionResult, board_size: int, qty: float | None, price: fl
         lines.append(f"Smelled {board_size} {things}. {short(moved[0])} came out best, then moved {moved[1]:+.1%} "
                      "while the fly was thinking, so it bought nothing.")
     else:
-        why = "it already holds the maximum" if len(result["held"]) >= MAX_POSITIONS else "there was nothing new it could buy"
+        why = {"full": f"it already holds its maximum of {result['max_positions']}", "no_cash": "it has no cash left to spend",
+               "nothing_new": "there was nothing new it could buy"}[result["no_order"] or "nothing_new"]
         lines.append(f"Smelled {board_size} {things} and bought nothing: {why}.")
     lessons = result["lessons"]
     lines.append(f"Session {result['session']}. " + ("No lessons yet: no trade has closed." if lessons == 0
@@ -97,7 +98,7 @@ def run_once(fly_id: str, config: FlyConfig, live: bool, record: bool, board_see
     hour = when.strftime("%Y-%m-%dT%H")
     positions = _positions(fly_id)
     account = clawstreet.portfolio(key, bot_id)
-    equity = float(account["equity"])
+    equity, cash = float(account["equity"]), float(account["cash"])
     config["equity"], config["return_pct"] = round(equity, 2), account.get("total_return_pct")
     save_fly(fly_id, config)
 
@@ -115,13 +116,13 @@ def run_once(fly_id: str, config: FlyConfig, live: bool, record: bool, board_see
 
     # Each fly draws its own board. Two flies that run in the same minute look at different symbols.
     seed = board_seed if board_seed is not None else int(when.strftime("%Y%m%d%H%M")) + (config["individuality"]["seed"] or 0)
-    symbols = compose_board(held, clawstreet.universe(key, config["universe"]), seed, BOARD_SIZE)
+    symbols = compose_board(held, clawstreet.universe(key, config["universe"]), seed, settings_for(config)["board_size"])
     before = clawstreet.quotes(key, symbols)
     board = massive.history(symbols, before) if data == "massive" else clawstreet.history(key, symbols)
     if len(board) < 2:
         raise SystemExit(f"{data} returned indicators for {len(board)} of {len(symbols)} symbols: {list(board)}")
     began = time.monotonic()
-    result = run_session(fly_id, config, board, closed, equity, when, live, record)
+    result = run_session(fly_id, config, board, closed, equity, cash, when, live, record)
     order, qty, price, moved = result["order"], None, None, None
     if order:
         price = clawstreet.quotes(key, [order["symbol"]])[order["symbol"]]
