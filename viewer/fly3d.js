@@ -45,7 +45,7 @@ window.Fly3D = function (opts) {
   // Room light from an HDRI, for reflections and the soft ambient a room has.
   if (THREE.RGBELoader) {
     const pmrem = new THREE.PMREMGenerator(renderer); pmrem.compileEquirectangularShader();
-    new THREE.RGBELoader().setDataType(THREE.UnsignedByteType).load(base + "textures/lythwood_room_1k.hdr", tex => {
+    new THREE.RGBELoader().setDataType(THREE.UnsignedByteType).load(base + "textures/room_light_512.hdr", tex => {
       scene.environment = pmrem.fromEquirectangular(tex).texture; tex.dispose(); pmrem.dispose();
     });
   }
@@ -91,7 +91,7 @@ window.Fly3D = function (opts) {
       const g = x.createRadialGradient(128, 128, 40, 128, 128, 128); g.addColorStop(0, "#fff"); g.addColorStop(0.55, "#bbb"); g.addColorStop(1, "#000");
       x.fillStyle = g; x.fillRect(0, 0, 256, 256); return new THREE.CanvasTexture(c);
     })();
-    const parquet = texLoader.load(base + "textures/diagonal_parquet_diff_1k.jpg", t => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3.4, 3.4); t.encoding = THREE.sRGBEncoding; t.anisotropy = 8; });
+    const parquet = texLoader.load(base + "textures/diagonal_parquet_512.jpg", t => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3.4, 3.4); t.encoding = THREE.sRGBEncoding; t.anisotropy = 8; });
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(800, 800), new THREE.MeshStandardMaterial({map: parquet, alphaMap: fade, transparent: true, roughness: 0.8, depthWrite: false}));
     floor.rotation.x = -Math.PI / 2; floor.position.y = ROOM.floor; floor.receiveShadow = true; scene.add(floor);
   }
@@ -256,23 +256,12 @@ window.Fly3D = function (opts) {
   const brain = new THREE.Mesh(new THREE.SphereGeometry(0.11, 14, 10), brainM); brain.renderOrder = 2;
   let R = null;   // the rig, once loaded
 
-  function parseSTL(buf) {
-    const dv = new DataView(buf); const n = dv.getUint32(80, true);
-    const raw = new Float32Array(n * 9);
-    for (let i = 0, o = 84; i < n; i++, o += 50) for (let k = 0; k < 3; k++) {
-      const b = o + 12 + k * 12; const x = dv.getFloat32(b, true), y = dv.getFloat32(b + 4, true), z = dv.getFloat32(b + 8, true);
-      raw[i * 9 + k * 3] = y * 1000; raw[i * 9 + k * 3 + 1] = z * 1000; raw[i * 9 + k * 3 + 2] = x * 1000;
-    }
-    // Merge shared vertices so the normals are smooth rather than faceted.
-    const index = new Uint32Array(n * 3), pos = [], seen = new Map();
-    for (let i = 0; i < n * 3; i++) {
-      const x = raw[i * 3], y = raw[i * 3 + 1], z = raw[i * 3 + 2];
-      const key = (x * 1e5 | 0) + "," + (y * 1e5 | 0) + "," + (z * 1e5 | 0);
-      let j = seen.get(key); if (j === undefined) { j = pos.length / 3; seen.set(key, j); pos.push(x, y, z); }
-      index[i] = j;
-    }
+  // The body is one packed file, model/body.bin, made by scripts/build_body_pack.py: each part's
+  // vertices once, in this scene's frame and in millimeters, and its triangle indices.
+  function partGeometry(bin, part) {
     const g = new THREE.BufferGeometry();
-    g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(new THREE.BufferAttribute(index, 1));
+    g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(bin, part.vertices[0], part.vertices[1] * 3), 3));
+    g.setIndex(new THREE.BufferAttribute(part.wide ? new Uint32Array(bin, part.indices[0], part.indices[1]) : new Uint16Array(bin, part.indices[0], part.indices[1]), 1));
     g.computeVertexNormals(); return g;
   }
   const mirrored = g => {
@@ -332,7 +321,8 @@ window.Fly3D = function (opts) {
       g.setAttribute("color", new THREE.BufferAttribute(c, 3)); return g;
     }
     const geo = {};
-    await Promise.all([...new Set(Object.values(rig.mesh))].map(async m => { geo[m] = parseSTL(await fetch(`${base}model/${m}.stl`).then(r => r.arrayBuffer())); }));
+    const [pack, bin] = await Promise.all([fetch(base + "model/body.json").then(r => r.json()), fetch(base + "model/body.bin").then(r => r.arrayBuffer())]);
+    for (const m of new Set(Object.values(rig.mesh))) geo[m] = partGeometry(bin, pack.parts[m]);
     const nodes = {}; const d = Math.PI / 180;
     for (const name of Object.keys(rig.bodies)) {
       const b = rig.bodies[name]; const node = new THREE.Group(); node.name = name;

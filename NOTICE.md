@@ -40,11 +40,11 @@ SOFTWARE.
 
 ## Fly body: NeuroMechFly
 
-`viewer/model/*.stl` and `viewer/model/rig.json` are from NeuroMechFly (flygym), Neuroengineering Laboratory, EPFL, https://github.com/NeLy-EPFL/flygym. License: Apache-2.0, in `viewer/model/LICENSE-flygym.txt`. Changes: the meshes are colored as a male *Drosophila melanogaster* and posed by the viewer.
+`viewer/model/body.bin`, `body.json` and `rig.json` are made from the meshes and joint data of NeuroMechFly (flygym), Neuroengineering Laboratory, EPFL, https://github.com/NeLy-EPFL/flygym. License: Apache-2.0, in `viewer/model/LICENSE-flygym.txt`. Changes: the 39 meshes are packed into one indexed file (`scripts/build_body_pack.py`), colored as a male *Drosophila melanogaster*, and posed by the viewer.
 
 ## Table, floor and room light: Poly Haven
 
-`viewer/model/table/` and `viewer/textures/` are from Poly Haven, https://polyhaven.com (wooden_table_02, diagonal_parquet, lythwood_room). License: CC0.
+`viewer/model/table/` and `viewer/textures/` are from Poly Haven, https://polyhaven.com (wooden_table_02, diagonal_parquet, lythwood_room). License: CC0. Changes: the floor texture and the room-light panorama are reduced in size (`scripts/build_room_light.py`), and the backdrop is a blurred crop of the panorama.
 
 ## three.js
 
