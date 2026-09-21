@@ -4,7 +4,7 @@ import json
 import subprocess
 import time
 
-from . import clawstreet
+from . import clawstreet, massive
 from .config import FlyConfig, api_key, home, save_fly
 from .memory import NOISE_FLOOR
 from .session import BOARD_SIZE, MAX_POSITIONS, SessionResult, compose_board, run_session, utc_now
@@ -80,8 +80,12 @@ def _drop_unfilled(fly_id: str, symbol: str) -> None:
     _save_positions(fly_id, positions)
 
 
-def run_once(fly_id: str, config: FlyConfig, live: bool, record: bool, board_seed: int | None = None) -> SessionResult:
-    """Run one session. `live` False is a rehearsal: nothing is sent and nothing is learned."""
+def run_once(fly_id: str, config: FlyConfig, live: bool, record: bool, board_seed: int | None = None,
+             data: str = "clawstreet") -> SessionResult:
+    """Run one session. `live` False is a rehearsal: nothing is sent and nothing is learned.
+
+    `data` is where the candles come from: "clawstreet" or "massive". Quotes and orders are always ClawStreet's.
+    """
     key = api_key(config)
     if not key:
         raise SystemExit(f"no API key for fly {fly_id} at {config['key']}. Run: flybrain register {fly_id}")
@@ -112,11 +116,10 @@ def run_once(fly_id: str, config: FlyConfig, live: bool, record: bool, board_see
     # Each fly draws its own board. Two flies that run in the same minute look at different symbols.
     seed = board_seed if board_seed is not None else int(when.strftime("%Y%m%d%H%M")) + (config["individuality"]["seed"] or 0)
     symbols = compose_board(held, clawstreet.universe(key, config["universe"]), seed, BOARD_SIZE)
-    board = clawstreet.history(key, symbols)
+    before = clawstreet.quotes(key, symbols)
+    board = massive.history(symbols, before) if data == "massive" else clawstreet.history(key, symbols)
     if len(board) < 2:
-        raise SystemExit(f"ClawStreet returned indicators for {len(board)} of {len(symbols)} symbols: {list(board)}")
-
-    before = clawstreet.quotes(key, list(board))
+        raise SystemExit(f"{data} returned indicators for {len(board)} of {len(symbols)} symbols: {list(board)}")
     began = time.monotonic()
     result = run_session(fly_id, config, board, closed, equity, when, live, record)
     order, qty, price, moved = result["order"], None, None, None

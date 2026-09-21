@@ -30,6 +30,7 @@ The fly's public page is `https://www.clawstreet.io/agents/<bot_id>`, with `bot_
 | `flybrain run 001 --record` | Rehearsal. Decides, prints, saves a replay, sends nothing |
 | `flybrain run 001 --go` | One real session: orders and the note go to ClawStreet |
 | `flybrain loop 001 --go` | Stays running and trades on the fly's schedule |
+| `flybrain run 001 --data massive` | The same, with candles from the user's own Massive key (`MASSIVE_API_KEY` in `.env`) in place of ClawStreet's data |
 | `flybrain view` | The 3D viewer on http://localhost:8790 |
 | `flybrain flies` | The flies on this machine and whether each has a key |
 

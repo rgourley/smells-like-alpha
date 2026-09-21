@@ -66,7 +66,7 @@ def register(args: argparse.Namespace) -> None:
 
 def run(args: argparse.Namespace) -> None:
     config = load_fly(args.fly)
-    result = run_once(args.fly, config, live=args.go, record=args.record or args.go, board_seed=args.seed)
+    result = run_once(args.fly, config, live=args.go, record=args.record or args.go, board_seed=args.seed, data=args.data)
     after_session(config, result)
 
 
@@ -76,7 +76,7 @@ def loop(args: argparse.Namespace) -> None:
         config = load_fly(args.fly)
         slot, why = due(args.fly, config, utc_now())
         if slot:
-            result = run_once(args.fly, config, live=args.go, record=True)
+            result = run_once(args.fly, config, live=args.go, record=True, data=args.data)
             mark_slot(args.fly, slot)
             after_session(config, result)
         elif args.verbose:
@@ -132,12 +132,14 @@ def main() -> None:
     p.add_argument("--go", action="store_true", help="place the order and post the note")
     p.add_argument("--record", action="store_true", help="save the replay of a rehearsal, for the viewer")
     p.add_argument("--seed", type=int, default=None, help="board seed. The default is the minute")
+    p.add_argument("--data", choices=["clawstreet", "massive"], default="clawstreet", help="where the candles come from")
     p.set_defaults(fn=run)
 
     p = sub.add_parser("loop", help="run sessions on the fly's schedule until stopped")
     p.add_argument("fly")
     p.add_argument("--go", action="store_true", help="place orders and post notes")
     p.add_argument("--verbose", action="store_true")
+    p.add_argument("--data", choices=["clawstreet", "massive"], default="clawstreet", help="where the candles come from")
     p.set_defaults(fn=loop)
 
     p = sub.add_parser("view", help="the 3D viewer")

@@ -65,6 +65,24 @@ A crypto fly with `--cadence 4h` decides at 00:00, 04:00, 08:00, 12:00, 16:00 an
 
 The learning rate, the forgetting rate, the 50 ms presentation and the sizing are settings in this repo. Everything else is read from the connectome. The full method and test results are in [the technical write-up](https://www.clawstreet.io/blog/fruit-fly-brain-trading-agent).
 
+## Market data
+
+Out of the box there is nothing to set up. The fly's ClawStreet key also fetches its market data: the symbol list, daily candles, indicators and live quotes, for US stocks and crypto. ClawStreet's data comes from [Massive](https://massive.com/?ref=clawstreet.io).
+
+To run on your own feed, get a [free Massive API key](https://massive.com/?ref=clawstreet.io), put it in `.env`, and add `--data massive`:
+
+```bash
+echo "MASSIVE_API_KEY=your_key" >> .env
+flybrain run 001 --data massive
+flybrain loop 001 --go --data massive
+```
+
+The fly then pulls daily candles for stocks and crypto straight from Massive and computes its own readings. They match ClawStreet's: the same candles give the same smell. Orders and live quotes still go through ClawStreet, because that is where the account is.
+
+The free Massive plan gives end-of-day data and five calls a minute. A board is eight symbols, so a session waits about a minute and a half for its candles, and the readings are as of the last close. A paid plan has current data and no limit: set `MASSIVE_CALLS_PER_MINUTE=0` in `.env`.
+
+Any other source works too. The brain never sees an API. It takes six readings per symbol: RSI(14), position in the 20-day Bollinger band, distance from the 50-day average, volume against its 20-day average, five-day return, and RSI trend. [flybrain/indicators.py](flybrain/indicators.py) computes all six from plain daily candles and has the exact definitions, and [flybrain/massive.py](flybrain/massive.py) is a working example of a source in under 70 lines.
+
 ## Every fly is an individual
 
 Real flies with identical genes still differ in how strongly each smell channel responds, and that gives each fly its own preferences (Honegger et al., PNAS 2020). `flybrain new` gives your fly a fixed gain per channel, drawn from its name, so its tastes differ a little from every other fly's. The wiring still dominates: most flies agree on what smells best, and differ on the close calls. Pass `--published-wiring` to run the connectome exactly as published.
@@ -109,6 +127,6 @@ The code in this repo is MIT licensed, by [Rob Gourley](https://www.robertcreati
 - Neuron model: Shiu P. K. et al., "A *Drosophila* computational brain model reveals sensorimotor processing", [Nature 634, 210–219 (2024)](https://www.nature.com/articles/s41586-024-07763-9). Model code MIT, Philip Shiu and Nico Spiller.
 - Simulator: [Brian2](https://brian2.readthedocs.io/), Stimberg, Brette and Goodman, eLife 2019.
 - Fly body in the viewer: NeuroMechFly, EPFL, Apache-2.0. Table and room light: Poly Haven, CC0. 3D: three.js, MIT.
-- Market data on ClawStreet comes from [Massive](https://massive.com/?ref=clawstreet.io).
+- Market data: [Massive](https://massive.com/?ref=clawstreet.io), through ClawStreet by default or directly with your own key.
 
 [NOTICE.md](NOTICE.md) has the full third-party notices.
