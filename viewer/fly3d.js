@@ -95,6 +95,39 @@ window.Fly3D = function (opts) {
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(800, 800), new THREE.MeshStandardMaterial({map: parquet, alphaMap: fade, transparent: true, roughness: 0.8, depthWrite: false}));
     floor.rotation.x = -Math.PI / 2; floor.position.y = ROOM.floor; floor.receiveShadow = true; scene.add(floor);
   }
+  // Dust through a lens. The camera is focused on the fly. A mote in that plane is a small bright
+  // point. A mote nearer the lens or far behind it spreads into a big, faint, soft disc. Its size is
+  // its real radius plus a circle of confusion that grows with its distance from the plane of focus,
+  // and its light is spread over that area, so a bigger disc is a fainter one.
+  const moteMaterial = radius => new THREE.ShaderMaterial({
+    uniforms: {focus: {value: 3}, px: {value: 600}, radius: {value: radius}, tint: {value: new THREE.Color(0xfff1d6)}},
+    vertexShader: `
+      uniform float focus; uniform float px; uniform float radius;
+      varying float vSoft; varying float vLight;
+      void main() {
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        float d = max(-mv.z, 0.05);
+        float r = radius + 0.032 * abs(d - focus);             // cm
+        vSoft = clamp((r - radius) / (radius * 6.0), 0.0, 1.0);
+        vLight = clamp(pow(radius / r, 1.05), 0.07, 1.0);
+        gl_PointSize = min(2.0 * r * px / d, 120.0);
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      uniform vec3 tint; varying float vSoft; varying float vLight;
+      void main() {
+        float t = length(gl_PointCoord - 0.5) * 2.0;
+        float sharp = exp(-t * t * 5.0);                       // in focus: a bright core
+        float disc = smoothstep(1.0, 0.55, t);                  // out of focus: an even disc with a soft rim
+        float a = mix(sharp, disc, vSoft) * vLight;
+        if (a < 0.004) discard;
+        gl_FragColor = vec4(tint * a, a);
+      }`,
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending});
+  const focusMotes = (...materials) => { const h = renderer.getDrawingBufferSize(new THREE.Vector2()).y;
+    const px = h / (2 * Math.tan(camera.fov * Math.PI / 360)), focus = camera.position.distanceTo(fly.position);
+    for (const m of materials) { m.uniforms.px.value = px; m.uniforms.focus.value = focus; } };
+
   // Dust in the light: a few hundred motes drifting slowly above the table.
   const motes = (() => {
     const n = 500, pos = new Float32Array(n * 3), vel = [];
@@ -109,30 +142,31 @@ window.Fly3D = function (opts) {
       x.fillStyle = grad; x.fillRect(0, 0, 64, 64);
       return new THREE.CanvasTexture(c);
     })();
-    const m = new THREE.Points(g, new THREE.PointsMaterial({color: 0xfff3dc, map: soft, size: 0.2, transparent: true, opacity: 0.5, depthWrite: false, sizeAttenuation: true, blending: THREE.AdditiveBlending}));
+    soft.dispose();
+    const m = new THREE.Points(g, moteMaterial(0.07)); m.frustumCulled = false;
     scene.add(m);
-    return {step(dt, t) { const a = g.attributes.position.array; for (let i = 0; i < n; i++) { const v = vel[i]; a[i * 3] += (v[0] + Math.sin(t * 0.7 + i) * 0.3) * dt; a[i * 3 + 1] += (v[1] + Math.cos(t * 0.5 + i * 1.3) * 0.2) * dt; a[i * 3 + 2] += (v[2] + Math.cos(t * 0.6 + i) * 0.3) * dt; if (a[i * 3 + 1] < 0.1 || a[i * 3 + 1] > 42) a[i * 3 + 1] = rnd(0.2, 40); if (Math.abs(a[i * 3]) > 72) a[i * 3] = -a[i * 3] * 0.98; if (Math.abs(a[i * 3 + 2]) > 46) a[i * 3 + 2] = -a[i * 3 + 2] * 0.98; } g.attributes.position.needsUpdate = true; }};
+    return {material: m.material, step(dt, t) { const a = g.attributes.position.array; for (let i = 0; i < n; i++) { const v = vel[i]; a[i * 3] += (v[0] + Math.sin(t * 0.7 + i) * 0.3) * dt; a[i * 3 + 1] += (v[1] + Math.cos(t * 0.5 + i * 1.3) * 0.2) * dt; a[i * 3 + 2] += (v[2] + Math.cos(t * 0.6 + i) * 0.3) * dt; if (a[i * 3 + 1] < 0.1 || a[i * 3 + 1] > 42) a[i * 3 + 1] = rnd(0.2, 40); if (Math.abs(a[i * 3]) > 72) a[i * 3] = -a[i * 3] * 0.98; if (Math.abs(a[i * 3 + 2]) > 46) a[i * 3 + 2] = -a[i * 3 + 2] * 0.98; } g.attributes.position.needsUpdate = true; }};
   })();
 
   // The room's motes are a meter apart on average, so a camera a few centimeters from the fly almost
   // never has one in frame. A few stay in a small box around the fly and wrap as it moves: enough to
   // catch the light now and then, not enough to read as a haze.
   const nearMotes = (() => {
-    const n = 40, R = 7, pos = new Float32Array(n * 3), vel = [];
+    const n = 60, R = 7, pos = new Float32Array(n * 3), vel = [];
     for (let i = 0; i < n; i++) { pos[i * 3] = rnd(-R, R); pos[i * 3 + 1] = rnd(0.05, 4.5); pos[i * 3 + 2] = rnd(-R, R); vel.push([rnd(-0.12, 0.12), rnd(-0.05, 0.08), rnd(-0.12, 0.12)]); }
     const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     const dot = (() => { const c = document.createElement("canvas"); c.width = c.height = 32; const x = c.getContext("2d"), gr = x.createRadialGradient(16, 16, 0, 16, 16, 16);
       gr.addColorStop(0, "rgba(255,255,255,.95)"); gr.addColorStop(0.35, "rgba(255,255,255,.35)"); gr.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = gr; x.fillRect(0, 0, 32, 32); return new THREE.CanvasTexture(c); })();
-    const m = new THREE.Points(g, new THREE.PointsMaterial({color: 0xfff1d6, map: dot, size: 0.05, transparent: true, opacity: 0.38, depthWrite: false, sizeAttenuation: true, blending: THREE.AdditiveBlending}));
-    m.frustumCulled = false; scene.add(m);
+    dot.dispose();
+    const m = new THREE.Points(g, moteMaterial(0.022)); m.frustumCulled = false; scene.add(m);
     const wrap = (v, lo, hi) => v < lo ? v + (hi - lo) : v > hi ? v - (hi - lo) : v;
-    return {step(dt, t, center) { const a = g.attributes.position.array;
+    return {material: m.material, step(dt, t, center) { const a = g.attributes.position.array;
       for (let i = 0; i < n; i++) { const v = vel[i];
         a[i * 3] = wrap(a[i * 3] + (v[0] + Math.sin(t * 0.6 + i) * 0.05) * dt, -R, R);
         a[i * 3 + 1] = wrap(a[i * 3 + 1] + (v[1] + Math.cos(t * 0.4 + i * 1.7) * 0.04) * dt, 0.05, 4.5);
         a[i * 3 + 2] = wrap(a[i * 3 + 2] + (v[2] + Math.cos(t * 0.5 + i) * 0.05) * dt, -R, R); }
       g.attributes.position.needsUpdate = true; m.position.set(center.x, 0, center.z); },
-      dispose() { g.dispose(); dot.dispose(); m.material.dispose(); }};
+      dispose() { g.dispose(); m.material.dispose(); }};
   })();
 
   let PLACE = null;   // where the place card stands, for the fly to climb
@@ -612,7 +646,7 @@ window.Fly3D = function (opts) {
     const level = brainM.userData.level || 0;
     brainM.opacity = act.sniff || act.feeding ? level * 0.45 * (0.55 + 0.45 * Math.abs(Math.sin(t * 6))) : 0;
     sun.position.copy(fly.position).add(tmp.set(18, 40, 12)); sun.target.position.copy(fly.position);
-    if (!reduce) { motes.step(dt, t); nearMotes.step(dt, t, fly.position); }
+    if (!reduce) { motes.step(dt, t); nearMotes.step(dt, t, fly.position); focusMotes(motes.material, nearMotes.material); }
     updateCamera(dt, moving);
     renderer.render(scene, camera);
   }
