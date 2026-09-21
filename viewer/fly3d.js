@@ -14,11 +14,13 @@ window.Fly3D = function (opts) {
   let held = [];   // what it owns; off duty it goes back to check on these
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const BODY = 0.3, WALK = 1.0, FLIGHT = 16, AIR = 5;
-  // Six cards sit three across at a foot wide; a bigger board goes four across, a little smaller.
-  const COLS = order.length > 6 ? 4 : 3;
+  // Six cards sit three across at a foot wide. A bigger board goes four across, a little smaller.
+  // Past eight it takes a third row of the same cards, and the table is made deeper to hold it.
+  const COLS = order.length > 6 ? 4 : 3, ROWS = Math.ceil(order.length / COLS);
   const CARD = COLS === 4 ? {w: 25, h: 15, dx: 27.5, dz: 23} : {w: 30, h: 18, dx: 36, dz: 25};
   const short = sym => sym.replace(/^X:/, "").replace(/USD$/, "");
-  const TABLE = {x: 52, z: 31};
+  // Half the usable top, in cm. Two rows of cards fit the table as scanned, 71 cm deep. Each further row adds a row's depth.
+  const TABLE_Z0 = 31, TABLE = {x: 52, z: TABLE_Z0 + Math.max(0, ROWS - 2) * CARD.dz / 2};
 
   const rnd = (a, b) => a + Math.random() * (b - a);
   const renderer = new THREE.WebGLRenderer({canvas, antialias: true});
@@ -66,7 +68,7 @@ window.Fly3D = function (opts) {
   let tableTop = 0;
   if (THREE.GLTFLoader) {
     new THREE.GLTFLoader().load(base + "model/table/wooden_table_02.gltf", g => {
-      const t = g.scene; t.scale.setScalar(100);
+      const t = g.scene; t.scale.set(100, 100, 100 * TABLE.z / TABLE_Z0);   // meters to cm, and deeper for a third row of cards
       t.updateMatrixWorld(true);
       const box = new THREE.Box3().setFromObject(t); t.position.y = -box.max.y; tableTop = 0;
       t.traverse(n => { if (n.isMesh) { n.receiveShadow = true; if (n.material.map) n.material.map.anisotropy = 8; if (n.material.normalMap) detail(n.material, grain, 36, 0.55); n.material.roughness = Math.min(0.75, n.material.roughness || 0.7); } });
@@ -112,8 +114,60 @@ window.Fly3D = function (opts) {
     return {step(dt, t) { const a = g.attributes.position.array; for (let i = 0; i < n; i++) { const v = vel[i]; a[i * 3] += (v[0] + Math.sin(t * 0.7 + i) * 0.3) * dt; a[i * 3 + 1] += (v[1] + Math.cos(t * 0.5 + i * 1.3) * 0.2) * dt; a[i * 3 + 2] += (v[2] + Math.cos(t * 0.6 + i) * 0.3) * dt; if (a[i * 3 + 1] < 0.1 || a[i * 3 + 1] > 42) a[i * 3 + 1] = rnd(0.2, 40); if (Math.abs(a[i * 3]) > 72) a[i * 3] = -a[i * 3] * 0.98; if (Math.abs(a[i * 3 + 2]) > 46) a[i * 3 + 2] = -a[i * 3 + 2] * 0.98; } g.attributes.position.needsUpdate = true; }};
   })();
 
+  // The room's motes are a meter apart on average, so a camera a few centimeters from the fly almost
+  // never has one in frame. A few stay in a small box around the fly and wrap as it moves: enough to
+  // catch the light now and then, not enough to read as a haze.
+  const nearMotes = (() => {
+    const n = 40, R = 7, pos = new Float32Array(n * 3), vel = [];
+    for (let i = 0; i < n; i++) { pos[i * 3] = rnd(-R, R); pos[i * 3 + 1] = rnd(0.05, 4.5); pos[i * 3 + 2] = rnd(-R, R); vel.push([rnd(-0.12, 0.12), rnd(-0.05, 0.08), rnd(-0.12, 0.12)]); }
+    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    const dot = (() => { const c = document.createElement("canvas"); c.width = c.height = 32; const x = c.getContext("2d"), gr = x.createRadialGradient(16, 16, 0, 16, 16, 16);
+      gr.addColorStop(0, "rgba(255,255,255,.95)"); gr.addColorStop(0.35, "rgba(255,255,255,.35)"); gr.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = gr; x.fillRect(0, 0, 32, 32); return new THREE.CanvasTexture(c); })();
+    const m = new THREE.Points(g, new THREE.PointsMaterial({color: 0xfff1d6, map: dot, size: 0.05, transparent: true, opacity: 0.38, depthWrite: false, sizeAttenuation: true, blending: THREE.AdditiveBlending}));
+    m.frustumCulled = false; scene.add(m);
+    const wrap = (v, lo, hi) => v < lo ? v + (hi - lo) : v > hi ? v - (hi - lo) : v;
+    return {step(dt, t, center) { const a = g.attributes.position.array;
+      for (let i = 0; i < n; i++) { const v = vel[i];
+        a[i * 3] = wrap(a[i * 3] + (v[0] + Math.sin(t * 0.6 + i) * 0.05) * dt, -R, R);
+        a[i * 3 + 1] = wrap(a[i * 3 + 1] + (v[1] + Math.cos(t * 0.4 + i * 1.7) * 0.04) * dt, 0.05, 4.5);
+        a[i * 3 + 2] = wrap(a[i * 3 + 2] + (v[2] + Math.cos(t * 0.5 + i) * 0.05) * dt, -R, R); }
+      g.attributes.position.needsUpdate = true; m.position.set(center.x, 0, center.z); },
+      dispose() { g.dispose(); dot.dispose(); m.material.dispose(); }};
+  })();
+
+  let PLACE = null;   // where the place card stands, for the fly to climb
+  // A folded place card at the front left of the table: the market data comes from Massive. 7.5 cm wide and
+  // 4.7 cm tall, cream card stock, the same on both faces.
+  {
+    const cv = document.createElement("canvas"); cv.width = 1024; cv.height = 640;
+    const tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 8;
+    const draw = logo => {
+      const x = cv.getContext("2d");
+      x.fillStyle = "#f4efe3"; x.fillRect(0, 0, 1024, 640);
+      x.strokeStyle = "rgba(20,20,26,.16)"; x.lineWidth = 6; x.strokeRect(34, 34, 956, 572);
+      x.fillStyle = "#5c5c68"; x.font = "500 44px JetBrains Mono, ui-monospace, monospace"; x.textAlign = "center";
+      x.fillText("M A R K E T   D A T A   B Y", 512, 236);
+      if (logo) { const w = 640, h = w * logo.height / logo.width; x.drawImage(logo, 512 - w / 2, 300, w, h); }
+      tex.needsUpdate = true;
+    };
+    draw(null);
+    const logo = new Image(); logo.onload = () => draw(logo); logo.src = base + "massive-logo-black.svg";
+    const paper = new THREE.MeshStandardMaterial({map: tex, roughness: 0.92, metalness: 0, side: THREE.DoubleSide});
+    const W = 7.5, H = 4.7, lean = 0.3, depth = 2 * H * Math.sin(lean), card = new THREE.Group();
+    for (const dir of [1, -1]) {
+      const face = new THREE.Mesh(new THREE.PlaneGeometry(W, H), paper);
+      face.position.set(0, Math.cos(lean) * H / 2, dir * Math.sin(lean) * H / 2);
+      face.rotation.set(-dir * lean, dir === 1 ? 0 : Math.PI, 0);
+      face.castShadow = true; card.add(face);   // no self-shadow: at this size the shadow map draws teeth along the edges
+    }
+    // The charts and their labels fill the table to within a few centimeters of the front edge.
+    // The card stands in that strip, at the front left: the brain panel covers the right of the picture.
+    card.position.set(-TABLE.x + W / 2 + 4, 0.01, TABLE.z - depth / 2 - 0.9); scene.add(card);
+    PLACE = {x: card.position.x, z: card.position.z, W, H, lean, depth};
+  }
+
   // Water and sugar, the two things a fly on a table goes looking for.
-  const SPOT = {water: new THREE.Vector3(-18, 0, -29), sugar: new THREE.Vector3(18, 0, -29)};
+  const SPOT = {water: new THREE.Vector3(-18, 0, -TABLE.z + 2), sugar: new THREE.Vector3(18, 0, -TABLE.z + 2)};
   {
     const drop = new THREE.Mesh(new THREE.SphereGeometry(0.9, 32, 20), new THREE.MeshPhysicalMaterial({color: 0xd6ecff, roughness: 0.03, metalness: 0, transparent: true, opacity: 0.5, clearcoat: 1}));
     drop.scale.set(1, 0.38, 1); drop.position.copy(SPOT.water); drop.position.y = 0.02; scene.add(drop);
@@ -156,7 +210,7 @@ window.Fly3D = function (opts) {
   };
   const dish = {};
   order.forEach((sym, k) => {
-    const x = (k % COLS - (COLS - 1) / 2) * CARD.dx, z = (Math.floor(k / COLS) - 0.5) * CARD.dz;
+    const x = (k % COLS - (COLS - 1) / 2) * CARD.dx, z = (Math.floor(k / COLS) - (ROWS - 1) / 2) * CARD.dz - (ROWS > 2 ? 2.5 : 0);
     const card = paper(drawChart(sym), CARD.w, CARD.h); card.position.set(x, 0.02, z); scene.add(card);
     const label = paper(drawLabel(sym), CARD.w, CARD.h * 0.25); label.position.set(x, 0.02, z + CARD.h / 2 + CARD.h * 0.125 + 0.8); scene.add(label);
     dish[sym] = new THREE.Vector3(x, 0, z);
@@ -358,7 +412,7 @@ window.Fly3D = function (opts) {
   const onCard = (sym, spread = 0.8) => { const p = dish[sym]; return new THREE.Vector3(p.x + rnd(-1, 1) * CARD.w / 2 * spread, 0, p.z + rnd(-1, 1) * CARD.h / 2 * spread); };
   const nearby = (p, r) => new THREE.Vector3(p.x + rnd(-r, r), 0, p.z + rnd(-r, r));
   function takeOff(to) {
-    flight = {from: fly.position.clone().setY(0), to: to.clone().setY(0), s: 0};
+    flight = {from: fly.position.clone().setY(0), to: to.clone().setY(0), s: 0, y0: fly.position.y};
     flight.len = Math.max(1, flight.from.distanceTo(flight.to)); mode = "fly";
   }
   function visit(sym, verdict, done, arrive) {
@@ -376,7 +430,7 @@ window.Fly3D = function (opts) {
     waypoints = [nearby(dish[sym], 3)]; dwellMs = 7000; takeOff(onCard(sym, 0.4)); say(`Going back to ${short(sym)}`);
   }
   function goto(sym) { visit(sym, stocks[sym].verdict, null); }
-  function abort() { onDone = null; onArrive = null; exploring = false; groomQueue = []; }
+  function abort() { onDone = null; onArrive = null; exploring = false; groomQueue = []; if (climb) { climb = null; fly.rotation.x = 0; mode = "idle"; } }
 
   // Off duty, the fly does what flies do: walks somewhere, flies somewhere,
   // stops to groom or rest.
@@ -402,9 +456,25 @@ window.Fly3D = function (opts) {
   // Three needs, 0 to 1, that rise with time and effort and choose what the
   // fly does off duty. Ours, not the connectome's: the brain here only smells.
   const needs = {hunger: 0.35, thirst: 0.45, tired: 0.2};
+  // Flies walk on anything, a wall as easily as a table. The fly lands in front of the place card,
+  // walks to its foot, climbs the steep front face to the ridge, sits there, and flies off.
+  let climb = null;
+  function goCard(after) {
+    const x = PLACE.x + rnd(-PLACE.W * 0.3, PLACE.W * 0.3), foot = new THREE.Vector3(x, 0, PLACE.z + PLACE.depth / 2 + 0.16);
+    dwellFeed = false; dwellMs = 0; waypoints = [foot];
+    onDone = () => { climb = {x, s: 0, sitUntil: 0, after}; mode = "climb"; say("Climbing the place card"); };
+    const landing = foot.clone(); landing.z += 1.6;
+    if (fly.position.distanceTo(foot) > 6) takeOff(landing); else mode = "walk";
+    say("Going to the place card");
+  }
   function goSpot(p, label, need, after) {
-    const q = nearby(p, 0.5); dwellFeed = true; dwellMs = 3200; onDone = () => { needs[need] = 0.08; dwellFeed = false; after(); };
-    if (fly.position.distanceTo(q) > 12) { waypoints = [q]; takeOff(nearby(p, 2)); } else { waypoints = [q]; mode = "walk"; }
+    // The fly stops at the rim, on the side it came from, facing the middle. The drop is 0.9 across
+    // its radius and the sugar is scattered 0.6 out, so a closer stop would put the fly inside them.
+    const side = tmp.copy(fly.position).sub(p).setY(0); if (side.lengthSq() < 1e-4) side.set(rnd(-1, 1), 0, rnd(-1, 1)); side.normalize();
+    const rim = need === "thirst" ? 1.12 : 0.85;
+    const q = p.clone().addScaledVector(side, rim), landing = p.clone().addScaledVector(side, rim + 1.4);
+    dwellFeed = true; dwellMs = 3200; onDone = () => { needs[need] = 0.08; dwellFeed = false; after(); };
+    if (fly.position.distanceTo(q) > 12) { waypoints = [q]; takeOff(landing); } else { waypoints = [q]; mode = "walk"; }
     say(label);
   }
   const randomSpot = () => new THREE.Vector3(rnd(-TABLE.x, TABLE.x), 0, rnd(-TABLE.z, TABLE.z));
@@ -425,6 +495,7 @@ window.Fly3D = function (opts) {
       if (r < rest) { waypoints = []; dwellMs = brief ? rnd(800, 1500) : rnd(8000, 22000) * (1.5 - a); mode = "walk"; say("Resting"); }
       else if (q < 0.5) { waypoints = [nearby(fly.position, 2.5), nearby(fly.position, 2.5)]; dwellMs = rnd(300, 800); mode = "walk"; say("Walking"); }
       else if (q < 0.85) { waypoints = []; mode = "walk"; dwellMs = startGrooming(performance.now(), brief ? 0.2 : 0.6); }
+      else if (PLACE && !brief && q < 0.9) { goCard(step); return; }
       else { const spot = randomSpot(); waypoints = [nearby(spot, 1.5)]; dwellMs = 300; takeOff(spot); say("Flying"); }
     };
     step();
@@ -444,7 +515,7 @@ window.Fly3D = function (opts) {
     // Flies clean themselves right after landing, most of the time.
     // A new instruction can arrive mid-flight (Replay pressed, a card clicked). The fly must come
     // down before it does anything on foot, or it walks on air.
-    if (mode !== "fly" && fly.position.y > 0) { fly.position.y = Math.max(0, fly.position.y - dt * 14); fly.rotation.y = heading; return fly.position.y > 0; }
+    if (mode !== "fly" && mode !== "climb" && fly.position.y > 0) { fly.position.y = Math.max(0, fly.position.y - dt * 14); fly.rotation.y = heading; return fly.position.y > 0; }
     if (mode !== "fly" && groomQueue.length) {
       while (groomQueue.length && now >= groomQueue[0].until) groomQueue.shift();
       if (groomQueue.length) { const g = groomQueue[0]; act.groom = g.legs; act.part = g.part; say(`Grooming its ${g.part}`); fly.rotation.y = heading; return false; }
@@ -457,7 +528,7 @@ window.Fly3D = function (opts) {
       flight.s = Math.min(1, flight.s + dt * FLIGHT / flight.len);
       const s = flight.s, e = s * s * (3 - 2 * s);
       tmp.lerpVectors(flight.from, flight.to, e);
-      const h = Math.min(AIR, flight.len * 0.35) * Math.sin(Math.PI * s) + 0.03 * Math.sin(now * 0.02);
+      const h = Math.min(AIR, flight.len * 0.35) * Math.sin(Math.PI * s) + 0.03 * Math.sin(now * 0.02) + flight.y0 * (1 - e);
       const ahead = tmp.clone().sub(fly.position);
       fly.position.set(tmp.x, h, tmp.z); speedNow = FLIGHT;
       if (ahead.lengthSq() > 1e-6) heading = Math.atan2(ahead.x, ahead.z);
@@ -474,6 +545,14 @@ window.Fly3D = function (opts) {
       if (Math.abs(diff) < 0.6) { const v = Math.min(dist, WALK * dt); fly.position.x += Math.sin(heading) * v; fly.position.z += Math.cos(heading) * v; speedNow = WALK; }
       else speedNow = WALK * 0.5;
       act.sniff = !exploring;
+    } else if (mode === "climb") {
+      // s runs from the foot of the face to just under the ridge. The body pitches to lie on the face.
+      const c = climb, top = 0.9;
+      if (c.s < top) { c.s = Math.min(top, c.s + dt * WALK * 0.7 / PLACE.H); speedNow = WALK * 0.7; if (c.s >= top) { c.sitUntil = now + rnd(4000, 9000); say("Sitting on the place card"); } }
+      else if (now >= c.sitUntil) { const after = c.after; climb = null; fly.rotation.x = 0; onDone = after; waypoints = [nearby(randomSpot(), 1.5)]; dwellMs = 300; takeOff(waypoints[0]); say("Flying"); return true; }
+      heading = Math.PI;
+      fly.position.set(c.x, Math.cos(PLACE.lean) * PLACE.H * c.s + 0.02, PLACE.z + PLACE.depth / 2 - Math.sin(PLACE.lean) * PLACE.H * c.s);
+      fly.rotation.order = "YXZ"; fly.rotation.x = -(Math.PI / 2 - PLACE.lean);
     } else if (mode === "dwell") {
       if (now >= dwellUntil) {
         mode = "idle"; act.feeding = false; act.sniff = false;
@@ -496,7 +575,7 @@ window.Fly3D = function (opts) {
     // The camera drifts round the fly all the time, faster when it travels.
     if (!reduce && performance.now() > dragUntil) orbit += dt * (moving ? 0.12 : 0.16);
     const aspect = camera.aspect || 1.6, fit = Math.max(1, 1.6 / aspect);
-    if (view === "wide") { const d = 108 * fit; wantPos.set(Math.sin(orbit * 0.2) * d, (62 + tilt * 40) * fit, Math.cos(orbit * 0.2) * d); wantLook.set(0, 0, 0); }
+    if (view === "wide") { const d = 108 * fit * Math.sqrt(TABLE.z / TABLE_Z0); wantPos.set(Math.sin(orbit * 0.2) * d, (62 + tilt * 40) * fit, Math.cos(orbit * 0.2) * d); wantLook.set(0, 0, 0); }
     else {
       const dist = (view === "close" ? 0.9 : 2.4) * fit, height = (view === "close" ? 0.42 : 0.95) * (1 + tilt);
       wantLook.copy(fly.position); wantLook.y += view === "close" ? BODY * 0.4 : 0.2;
@@ -533,7 +612,7 @@ window.Fly3D = function (opts) {
     const level = brainM.userData.level || 0;
     brainM.opacity = act.sniff || act.feeding ? level * 0.45 * (0.55 + 0.45 * Math.abs(Math.sin(t * 6))) : 0;
     sun.position.copy(fly.position).add(tmp.set(18, 40, 12)); sun.target.position.copy(fly.position);
-    if (!reduce) motes.step(dt, t);
+    if (!reduce) { motes.step(dt, t); nearMotes.step(dt, t, fly.position); }
     updateCamera(dt, moving);
     renderer.render(scene, camera);
   }
@@ -542,7 +621,7 @@ window.Fly3D = function (opts) {
     if (canvas.width !== Math.floor(w * renderer.getPixelRatio()) || canvas.height !== Math.floor(h * renderer.getPixelRatio())) { renderer.setSize(w, h, false); camera.aspect = w / h; slideNow = -1; camera.clearViewOffset(); camera.updateProjectionMatrix(); }
   }
   { const home = dish[pick] || dish[order[0]]; fly.position.set(home.x + 3, 0, home.z + 2); }
-  window.__fly3d = {scene, camera, renderer, fly, portrait, snapshot, top: v => { debugTop = v; }, debug: () => ({mode, view, tilt, orbit, look: look.toArray(), wantLook: wantLook.toArray(), camPos: camPos.toArray(), waypoints: waypoints.length, act: {...act}, exploring, flight: flight && flight.s})};
+  window.__fly3d = {scene, camera, renderer, fly, portrait, snapshot, perch: () => { if (PLACE) { exploring = true; goCard(() => explore(1e9, null)); } }, top: v => { debugTop = v; }, debug: () => ({mode, view, tilt, orbit, look: look.toArray(), wantLook: wantLook.toArray(), camPos: camPos.toArray(), waypoints: waypoints.length, act: {...act}, exploring, flight: flight && flight.s})};
 
   // Run the loop only while the canvas is on screen and the tab is visible. A 3D view that keeps
   // drawing after the reader has scrolled past it costs battery and GPU memory for nothing.
@@ -554,6 +633,7 @@ window.Fly3D = function (opts) {
   // Free everything the GPU holds. A full page load does this anyway; a single-page app moving to
   // another route does not, and that is where a 3D view leaks.
   function dispose() {
+    nearMotes.dispose();
     alive = false; cancelAnimationFrame(raf); watcher.disconnect(); document.removeEventListener("visibilitychange", wake);
     scene.traverse(o => {
       if (o.geometry) o.geometry.dispose();
