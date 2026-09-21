@@ -1,6 +1,6 @@
 # Keep a fly running
 
-`flybrain loop 001 --go` trades on the fly's schedule for as long as it runs. It checks every five minutes whether a session is due, and one session runs per slot. To have it start with the machine and restart after a crash, hand it to the system's scheduler. The machine must be awake at session time.
+`flybrain loop 001 --go` trades on the fly's schedule for as long as it runs. It checks every five minutes whether a session is due, and one session runs per slot. To have it start with the machine and restart after a crash, hand it to the system's scheduler. A crypto fly on an `<N>h` cadence catches up: if the machine was asleep at the top of a window, the session runs as soon as it wakes, once per window. A daily stock fly has to be awake between 15:30 and 16:00 New York time, because an order does not fill after the close. On a Mac, `caffeinate -is` in front of the command keeps a plugged-in machine awake.
 
 An order's idempotency key is made from the session hour, so a restart in the same hour cannot fill the same order twice.
 
