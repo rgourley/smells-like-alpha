@@ -109,7 +109,7 @@ window.Fly3D = function (opts) {
         float d = max(-mv.z, 0.05);
         float r = radius + 0.032 * abs(d - focus);             // cm
         vSoft = clamp((r - radius) / (radius * 6.0), 0.0, 1.0);
-        vLight = clamp(pow(radius / r, 1.05), 0.07, 1.0);
+        vLight = clamp(pow(radius / r, 1.05), 0.055, 1.0) * 0.85;
         gl_PointSize = min(2.0 * r * px / d, 120.0);
         gl_Position = projectionMatrix * mv;
       }`,
@@ -152,7 +152,7 @@ window.Fly3D = function (opts) {
   // never has one in frame. A few stay in a small box around the fly and wrap as it moves: enough to
   // catch the light now and then, not enough to read as a haze.
   const nearMotes = (() => {
-    const n = 60, R = 7, pos = new Float32Array(n * 3), vel = [];
+    const n = 42, R = 7, pos = new Float32Array(n * 3), vel = [];
     for (let i = 0; i < n; i++) { pos[i * 3] = rnd(-R, R); pos[i * 3 + 1] = rnd(0.05, 4.5); pos[i * 3 + 2] = rnd(-R, R); vel.push([rnd(-0.12, 0.12), rnd(-0.05, 0.08), rnd(-0.12, 0.12)]); }
     const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     const dot = (() => { const c = document.createElement("canvas"); c.width = c.height = 32; const x = c.getContext("2d"), gr = x.createRadialGradient(16, 16, 0, 16, 16, 16);
