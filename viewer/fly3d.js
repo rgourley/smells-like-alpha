@@ -110,7 +110,7 @@ window.Fly3D = function (opts) {
         float d = max(-mv.z, 0.05);
         float r = radius + 0.032 * abs(d - focus);             // cm
         vSoft = clamp((r - radius) / (radius * 6.0), 0.0, 1.0);
-        vLight = clamp(pow(radius / r, 1.05), 0.055, 1.0) * 0.85 * fade;
+        vLight = clamp(pow(radius / r, 1.05), 0.08, 1.0) * fade;
         gl_PointSize = min(2.0 * r * px / d, 120.0);
         gl_Position = projectionMatrix * mv;
       }`,
@@ -134,8 +134,11 @@ window.Fly3D = function (opts) {
   function dustLayer(n, box, radius, speed) {
     const pos = new Float32Array(n * 3), fade = new Float32Array(n), life = new Float32Array(n), period = new Float32Array(n), vel = [];
     const place = i => { pos[i * 3] = rnd(-box.x, box.x); pos[i * 3 + 1] = rnd(box.y0, box.y1); pos[i * 3 + 2] = rnd(-box.z, box.z);
-      vel[i] = [rnd(-1, 1) * speed, rnd(-0.35, 0.6) * speed, rnd(-1, 1) * speed]; period[i] = rnd(6, 14); };
-    for (let i = 0; i < n; i++) { place(i); life[i] = Math.random(); const f = Math.sin(Math.PI * life[i]); fade[i] = f * f; }   // with reduced motion the dust stays as it starts
+      vel[i] = [rnd(-1, 1) * speed, rnd(-0.35, 0.6) * speed, rnd(-1, 1) * speed]; period[i] = rnd(16, 32); };
+    // A mote comes up over the first tenth of its life, holds, and fades over the last third.
+    const ramp = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+    const glow = x => ramp(0, 0.1, x) * (1 - ramp(0.67, 1, x));
+    for (let i = 0; i < n; i++) { place(i); life[i] = Math.random(); fade[i] = glow(life[i]); }   // with reduced motion the dust stays as it starts
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setAttribute("fade", new THREE.BufferAttribute(fade, 1));
     const m = new THREE.Points(g, moteMaterial(radius)); m.frustumCulled = false; scene.add(m);
@@ -147,7 +150,7 @@ window.Fly3D = function (opts) {
           pos[i * 3] += (v[0] + Math.sin(t * 0.6 + i) * swirl) * dt;
           pos[i * 3 + 1] += (v[1] + Math.cos(t * 0.4 + i * 1.7) * swirl * 0.5) * dt;
           pos[i * 3 + 2] += (v[2] + Math.cos(t * 0.5 + i) * swirl) * dt;
-          const f = Math.sin(Math.PI * life[i]); fade[i] = f * f;
+          fade[i] = glow(life[i]);
         }
         g.attributes.position.needsUpdate = true; g.attributes.fade.needsUpdate = true;
         if (center) m.position.set(center.x, 0, center.z);
