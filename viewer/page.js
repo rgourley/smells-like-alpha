@@ -235,7 +235,7 @@ window.FlyPage = function ({STOCKS, ORDER, PICK, CANDLES, META, base = "", site 
       ORDER.forEach((sym, k) => {
         const v = verd[sym]; const x = x0 + k * cw;
         g.fillStyle = "rgba(255,255,255,.08)"; g.fillRect(x, top, cw - 4, base - top);
-        if (v !== undefined) { const bh = Math.max(3, Math.min(1, Math.max(0, v) / max) * (base - top)); g.fillStyle = sym === PICK && bar.classList.contains("pick") ? col("--brand") : "rgba(0,255,136,.55)"; g.fillRect(x, base - bh, cw - 4, bh); }
+        if (v !== undefined) { const bh = Math.max(3, Math.min(1, Math.max(0, v) / max) * (base - top)); const pick = sym === PICK && bar.classList.contains("pick"); g.fillStyle = col("--brand"); g.globalAlpha = pick ? 1 : 0.55; g.fillRect(x, base - bh, cw - 4, bh); g.globalAlpha = 1; }
         g.fillStyle = col("--muted"); g.font = "500 13px JetBrains Mono, monospace"; g.textAlign = "center"; g.fillText(short(sym).slice(0, 5), x + (cw - 4) / 2, top + 4);
       });
       g.textAlign = "left";

@@ -214,7 +214,7 @@ window.Fly3D = function (opts) {
     for (let k = 1; k < 5; k++) { g.beginPath(); g.moveTo(0, 60 + k * 104); g.lineTo(1024, 60 + k * 104); g.stroke(); }
     rows.forEach((r, i) => {
       const [o, h, l, cl] = r, x = i * w + w / 2, up = cl >= o;
-      g.strokeStyle = g.fillStyle = up ? col("--brand") : col("--neg");
+      g.strokeStyle = g.fillStyle = up ? col("--up") : col("--neg");
       g.lineWidth = 4; g.beginPath(); g.moveTo(x, y(h)); g.lineTo(x, y(l)); g.stroke();
       const top = y(Math.max(o, cl)), bot = y(Math.min(o, cl));
       g.fillRect(x - w * 0.28, top, w * 0.56, Math.max(4, bot - top));
