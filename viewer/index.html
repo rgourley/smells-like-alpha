@@ -8,7 +8,8 @@
     --surface: #0d0d10; --elev: #16161a; --panel: #202026; --hover: #2a2a32;
     --text: #f0f0f5; --text-2: #b4b4c0; --muted: #9191a0;
     --brand: #00ff88; --brand-soft: rgba(0,255,136,.14);
-    --up: #00ff88;   /* a rising candle. Kept apart from --brand so a skin can recolor the page and not the market */
+    --up: #00ff88;   /* a rising candle, a gain. Kept apart from --brand so a skin can recolor the page and not the market */
+    --on-brand: #06140d; /* text on a solid --brand fill */
     --accent: #3ea6ff; --accent-soft: rgba(0,143,250,.18);
     --neg: #ef4444; --neg-soft: rgba(239,68,68,.16);
     --border: rgba(255,255,255,.08); --grid: rgba(255,255,255,.07);
@@ -22,6 +23,7 @@
     --text: #15151a; --text-2: #4a4a58; --muted: #7a7a8a;
     --brand: #00a862; --brand-soft: rgba(0,168,98,.16);
     --up: #00a862;
+    --on-brand: #ffffff;
     --accent: #0071c8; --accent-soft: rgba(0,113,200,.14);
     --neg: #d23c3c; --neg-soft: rgba(210,60,60,.14);
     --border: rgba(20,20,30,.10); --grid: rgba(20,20,30,.08);
@@ -77,7 +79,7 @@
   .flypick .nm { font-weight: 600; }
   .flypick .eq { color: var(--text-2); font-variant-numeric: tabular-nums; }
   .flypick .rt { font-variant-numeric: tabular-nums; }
-  .flypick .up { color: var(--brand); } .flypick .down { color: var(--neg); } .flypick .flat { color: var(--muted); }
+  .flypick .up { color: var(--up); } .flypick .down { color: var(--neg); } .flypick .flat { color: var(--muted); }
   .flypick .caret { margin-left: auto; align-self: center; width: 0; height: 0; border: 4px solid transparent; border-top-color: var(--text-2); border-bottom: 0; }
   .flypick ul { position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 4px); margin: 0; padding: 4px; list-style: none; border-radius: 10px; background: rgba(22,22,26,.96); border: 1px solid var(--border); box-shadow: 0 12px 30px rgba(0,0,0,.45); }
   .flypick li a { display: flex; align-items: baseline; gap: 10px; padding: 8px 10px; border-radius: 6px; font-size: 14px; color: var(--text); text-decoration: none; }
@@ -217,7 +219,7 @@
   .follow-links { display: flex; flex-wrap: wrap; gap: 8px; }
   .btn { display: inline-block; font: 500 13px var(--sans); color: var(--text); background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; text-decoration: none; }
   .btn:hover { background: var(--hover); }
-  .btn.primary { background: var(--brand); color: #06140d; border-color: transparent; font-weight: 600; }
+  .btn.primary { background: var(--brand); color: var(--on-brand); border-color: transparent; font-weight: 600; }
   .callout { margin-top: 16px; padding: 14px 16px; background: var(--elev); border-left: 3px solid var(--brand); border-radius: 0 10px 10px 0; }
   .callout .eyebrow { margin-bottom: 6px; }
   .thought { font: 13px/1.6 var(--mono); color: var(--text); white-space: pre-line; }
