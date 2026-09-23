@@ -10,7 +10,7 @@ Each event has `step` (its position, from 0) and `type`. Events appear in the or
 
 | Type | Fields |
 | --- | --- |
-| `start` | `session`, `held` (symbols), `drift`, `universe` (`stocks` or `crypto`), `cadence` (`daily` or `<N>h`) |
+| `start` | `session`, `held` (symbols), `drift`, `universe` (`stocks` or `crypto`), `cadence` (`daily`, New York times such as `12:30,15:30`, or `<N>h`) |
 | `board` | `stocks`: per symbol, `reading` (the six indicators), `price`, `bars` (up to 20 candles as `[open, high, low, close]`) |
 | `settle` | `symbol`, `profitable`, `cells` (how many learned), `opened`, `compartment` (`reward` or `punishment`) |
 | `forget` | `drift` after recovery |

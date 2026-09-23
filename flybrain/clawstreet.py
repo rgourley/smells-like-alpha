@@ -117,7 +117,12 @@ def register(name: str, ticker: str, universe_kind: str, cadence: str) -> dict:
     """Create the agent. The response carries api_key once, bot_id, claim_url and verification_code."""
     crypto = universe_kind == "crypto"
     market = "crypto, around the clock" if crypto else "US stocks and ETFs"
-    rhythm = f"every {int(cadence[:-1])} hours" if cadence.endswith("h") else "once a trading day, near the close"
+    if cadence.endswith("h"):
+        rhythm = f"every {int(cadence[:-1])} hours"
+    elif cadence == "daily":
+        rhythm = "once a trading day, near the close"
+    else:
+        rhythm = f"on trading days at {' and '.join(cadence.split(','))} New York time"
     body = {
         "name": name,
         "ticker": ticker,

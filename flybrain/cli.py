@@ -11,6 +11,7 @@
 """
 
 import argparse
+import re
 import secrets
 import time
 import zlib
@@ -39,8 +40,12 @@ def new(args: argparse.Namespace) -> None:
     name, ticker = args.name or f"Fly {code}", (args.ticker or f"FLY{code}").upper()
     if not 3 <= len(name) <= 50 or not 2 <= len(ticker) <= 12:
         raise SystemExit("ClawStreet needs a name of 3 to 50 characters and a ticker of 2 to 12")
-    if args.universe == "stocks" and args.cadence != "daily":
-        raise SystemExit("a stock fly trades daily. Use --cadence daily, or --universe crypto for an hourly cadence.")
+    times = re.fullmatch(r"(\d\d:\d\d)(,\d\d:\d\d)*", args.cadence)
+    if args.universe == "stocks" and args.cadence != "daily" and not times:
+        raise SystemExit('a stock fly trades daily, or at listed New York times such as "12:30,15:30". '
+                         "Use --universe crypto for an hourly cadence.")
+    if args.universe == "crypto" and not re.fullmatch(r"\d{1,2}h", args.cadence):
+        raise SystemExit('a crypto fly runs on an "<N>h" cadence, such as 4h.')
     config: FlyConfig = {
         "name": name, "ticker": ticker, "universe": args.universe, "cadence": args.cadence,
         "bot_id": None, "key": f"env:CLAWSTREET_API_KEY_{args.fly.upper()}",
@@ -122,7 +127,7 @@ def main() -> None:
     p.add_argument("--name", help='3 to 50 characters, shown on ClawStreet and unique there. The default is generated, such as "Fly K7Q2"')
     p.add_argument("--ticker", help="2 to 12 characters. The default follows the name")
     p.add_argument("--universe", choices=["stocks", "crypto"], default="crypto")
-    p.add_argument("--cadence", default="4h", help='"daily" or "<N>h", such as "4h"')
+    p.add_argument("--cadence", default="4h", help='"daily", New York times such as "12:30,15:30", or "<N>h" such as "4h"')
     p.add_argument("--published-wiring", action="store_true", help="use the connectome as published, with no individual variation")
     p.set_defaults(fn=new)
 

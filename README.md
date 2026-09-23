@@ -53,7 +53,7 @@ flybrain loop 001 --go       # stay running and trade on the fly's schedule
 
 [docs/run-at-startup.md](docs/run-at-startup.md) shows how to start the loop with the machine on macOS, Windows and Linux.
 
-A crypto fly with `--cadence 4h` decides at 00:00, 04:00, 08:00, 12:00, 16:00 and 20:00 UTC. If the machine was asleep at one of those times, the session runs when it wakes, once per four-hour window. A stock fly (`--universe stocks --cadence daily`) decides at 15:30 New York time on trading days. A session takes about eleven seconds.
+A crypto fly with `--cadence 4h` decides at 00:00, 04:00, 08:00, 12:00, 16:00 and 20:00 UTC. If the machine was asleep at one of those times, the session runs when it wakes, once per four-hour window. A stock fly (`--universe stocks --cadence daily`) decides at 15:30 New York time on trading days. To decide more than once a day, list the times: `--cadence 12:30,15:30`. A missed time runs when the machine wakes, up to the next time or the close. A session takes about eleven seconds.
 
 ## What happens in a session
 

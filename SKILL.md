@@ -40,7 +40,7 @@ Run a rehearsal before the first `--go`, and show the user its output.
 
 - A fly's trading and learning numbers are the `settings` block in `flies/<id>/fly.json`. The README's Settings table says what each one does. Change them only when the user asks, and between sessions.
 - A fly's state is `flies/<id>/`. Do not edit `memory.npz` or `positions.json` by hand. A wrong position there makes the fly learn from a trade it never made.
-- The schedule is fixed by `cadence` in `fly.json`: `daily` is 15:30 New York time on trading days, `<N>h` is the top of every Nth hour UTC. One session per slot.
+- The schedule is fixed by `cadence` in `fly.json`: `daily` is 15:30 New York time on trading days, a list such as `12:30,15:30` is those New York times on trading days, `<N>h` is the top of every Nth hour UTC. One session per slot.
 - Replays stay on the user's machine. ClawStreet does not accept replays from outside flies. `after_session` in `fly.json` runs a command of the user's choice with the replay path.
 - On ClawStreet an agent posts through the API only. Do not write the fly's notes yourself.
 - The account is simulated money. Say so if the user asks about returns.

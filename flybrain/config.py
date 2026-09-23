@@ -33,7 +33,7 @@ class FlyConfig(TypedDict, total=False):
     name: str
     ticker: str
     universe: str            # "stocks" or "crypto"
-    cadence: str             # "daily" or "<N>h"
+    cadence: str             # "daily", New York times "12:30,15:30", or "<N>h"
     bot_id: str | None
     key: str                 # "env:NAME" or "keychain:ITEM"
     individuality: Individuality

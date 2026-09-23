@@ -96,11 +96,17 @@ window.FlyPage = function ({STOCKS, ORDER, PICK, CANDLES, META, base = "", site 
     const hours = /^(\d+)h$/.exec(META.cadence);
     if (hours) { const h = +hours[1] * 3600e3; next = new Date(Math.ceil((now.getTime() + 1) / h) * h); }
     else {
+      // A stock fly decides at listed New York times on weekdays. "daily" is 15:30.
+      const times = META.cadence === "daily" ? ["15:30"] : META.cadence.split(",").sort();
       const [y, m, d] = newYork(now);
-      for (let k = 0; k < 8; k++) {
+      search: for (let k = 0; k < 8; k++) {
         const noon = new Date(Date.UTC(y, m, d + k, 17)), [, , , weekday, offset] = newYork(noon);
-        next = new Date(Date.UTC(y, m, d + k, 15, 30) - offset);
-        if (weekday !== 0 && weekday !== 6 && next > now) break;
+        if (weekday === 0 || weekday === 6) continue;
+        for (const t of times) {
+          const [hh, mm] = t.split(":").map(Number);
+          next = new Date(Date.UTC(y, m, d + k, hh, mm) - offset);
+          if (next > now) break search;
+        }
       }
     }
     const s = Math.floor((next - now) / 1000), hh = Math.floor(s / 3600), mm = Math.floor(s % 3600 / 60), ss = s % 60;
@@ -337,10 +343,10 @@ window.FlyPage.session = function (replay, fly) {
     STOCKS[sym] = {price: num(b.price), verdict: num(e.verdict), r: reading(b.reading || {}), cells: (e.cells || []).map(num), held: !!e.held};
     CANDLES[sym] = (b.bars || []).map(bar => bar.map(num));
   }
-  const when = new Date(replay.when), daily = start.cadence === "daily";
+  const when = new Date(replay.when), daily = start.cadence === "daily", hourly = /h$/.test(String(start.cadence));
   const META = {fly: fly.id, botId: fly.botId, name: fly.name, cadence: String(start.cadence), session: num(start.session), dry: !!replay.dry,
     flies: fly.roster.map(r => r.id), roster: fly.roster, holdsNow: fly.holdsNow,
-    market: `${start.universe === "crypto" ? "Crypto" : "US stocks"}, ${daily ? "daily" : "every " + parseInt(start.cadence) + " hours"}`,
+    market: `${start.universe === "crypto" ? "Crypto" : "US stocks"}, ${daily ? "daily" : hourly ? "every " + parseInt(start.cadence) + " hours" : String(start.cadence).split(",").join(" and ") + " New York"}`,
     date: when.toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric", timeZone: "UTC"}) + (daily ? "" : " " + when.toISOString().slice(11, 16) + " UTC"),
     dollars: buy ? (said && said.qty && said.price ? num(said.qty) * num(said.price) : num(buy.dollars)) : 0, half: buy ? num(buy.margin) < 0.36 : false,
     thought: said ? String(said.body) : null, sold: ev("sell").map(e => String(e.symbol)), held: (start.held || []).map(String)};
