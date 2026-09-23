@@ -49,8 +49,8 @@ def history(key: str, symbols: list[str], periods: int = 20) -> dict[str, dict]:
 
 
 def quotes(key: str, symbols: list[str]) -> dict[str, float]:
-    """Live prices. An order fills against these."""
-    got = api(key, "GET", f"/data/quotes?symbols={quote(','.join(symbols))}")["quotes"]
+    """Live prices. An order fills against these. fresh=1 skips every cache on the way."""
+    got = api(key, "GET", f"/data/quotes?symbols={quote(','.join(symbols))}&fresh=1")["quotes"]
     return {s: float(q["price"]) for s, q in got.items() if q.get("price")}
 
 
