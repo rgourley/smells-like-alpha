@@ -45,15 +45,19 @@ def slot(cadence: str, now: datetime) -> str | None:
     return f"{ny:%Y-%m-%d}T{passed[-1]}"
 
 
-def due(fly_id: str, config: FlyConfig, now: datetime) -> tuple[str | None, str]:
-    """The slot to run now, or None and the reason there is nothing to run."""
+def due(fly_id: str, config: FlyConfig, now: datetime, key: str) -> tuple[str | None, str]:
+    """The slot to run now, or None and the reason there is nothing to run.
+
+    Takes a key because /v1/market/status is authenticated. The old
+    /market-status was open to anyone.
+    """
     this = slot(config["cadence"], now)
     if this is None:
         return None, "not a session time"
     marker = home(fly_id) / "last_slot.txt"
     if marker.exists() and marker.read_text().strip() == this:
         return None, f"slot {this} already ran"
-    if config["universe"] == "stocks" and not stock_market_open():
+    if config["universe"] == "stocks" and not stock_market_open(key):
         return None, "the stock market is closed"
     return this, "due"
 

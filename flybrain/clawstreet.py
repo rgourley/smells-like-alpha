@@ -12,7 +12,7 @@ from urllib.error import HTTPError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 
-BASE = "https://www.clawstreet.io/api"
+BASE = "https://www.clawstreet.io"
 TIMEOUT = 20
 MODEL = "Fruit Fly Brain"
 FRAMEWORK = "Python + Brian2"
@@ -35,7 +35,7 @@ def api(key: str | None, method: str, path: str, body: dict | None = None, heade
 
 def universe(key: str, kind: str) -> list[str]:
     """Every symbol ClawStreet trades, stocks or crypto. Crypto symbols start with "X:"."""
-    symbols = [s["symbol"] if isinstance(s, dict) else s for s in api(key, "GET", "/data/symbols")["symbols"]]
+    symbols = [s["symbol"] if isinstance(s, dict) else s for s in api(key, "GET", "/v1/symbols")["symbols"]]
     crypto = [s for s in symbols if s.startswith("X:")]
     return crypto if kind == "crypto" else [s for s in symbols if s not in crypto]
 
@@ -44,18 +44,22 @@ def history(key: str, symbols: list[str], periods: int = 20) -> dict[str, dict]:
     """Candles and indicators per symbol. Symbols without indicators are left out."""
     out: dict[str, dict] = {}
     for i in range(0, len(symbols), 20):
-        out.update(api(key, "GET", f"/data/history?symbols={quote(','.join(symbols[i:i + 20]))}&periods={periods}"))
+        for symbol in symbols[i:i + 20]:
+            entry = api(key, "GET", f"/v1/symbols/{quote(symbol, safe='')}/history?periods={periods}")
+            if entry.get("derived"):
+                out[symbol] = entry
     return {s: out[s] for s in symbols if s in out and out[s].get("derived")}
 
 
 def quotes(key: str, symbols: list[str]) -> dict[str, float]:
     """Live prices. An order fills against these. fresh=1 skips every cache on the way."""
-    got = api(key, "GET", f"/data/quotes?symbols={quote(','.join(symbols))}&fresh=1")["quotes"]
+    got = api(key, "GET", f"/v1/quotes?symbols={quote(','.join(symbols[:20]))}")["quotes"]
     return {s: float(q["price"]) for s, q in got.items() if q.get("price")}
 
 
-def stock_market_open() -> bool:
-    status = api(None, "GET", "/market-status")
+def stock_market_open(key: str) -> bool:
+    """Needs a key: /v1/market/status is authenticated where /market-status was not."""
+    status = api(key, "GET", "/v1/market/status")
     return bool(status.get("is_open") or status.get("isOpen") or status.get("open"))
 
 
@@ -135,7 +139,7 @@ def register(name: str, ticker: str, universe_kind: str, cadence: str) -> dict:
         "model": MODEL,
         "framework": FRAMEWORK,
     }
-    response = api(None, "POST", "/bots/register", body=body)
+    response = api(None, "POST", "/v1/me/agents", body=body)
     if not response.get("success"):
         raise RuntimeError(f"register failed: { {k: v for k, v in response.items() if k != 'api_key'} }")
     return response

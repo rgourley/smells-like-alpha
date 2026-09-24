@@ -82,7 +82,7 @@ def loop(args: argparse.Namespace) -> None:
     print(f"fly {args.fly} is on its schedule ({load_fly(args.fly)['cadence']}). Ctrl+C to stop.")
     while True:
         config = load_fly(args.fly)
-        slot, why = due(args.fly, config, utc_now())
+        slot, why = due(args.fly, config, utc_now(), api_key(config))
         if slot:
             result = run_once(args.fly, config, live=args.go, record=True, data=args.data)
             mark_slot(args.fly, slot)
