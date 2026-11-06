@@ -63,13 +63,14 @@ def register(args: argparse.Namespace) -> None:
     if config.get("bot_id"):
         raise SystemExit(f"{config['name']} is already registered as {config['bot_id']}")
     response = clawstreet.register(config["name"], config["ticker"], config["universe"], config["cadence"])
-    place = store_api_key(config, response["api_key"])   # first, before anything else can fail
-    config["bot_id"] = response["bot_id"]
+    place = store_api_key(config, response["api_key"]["secret"])   # first, before anything else can fail
+    print(f"claim the agent here, signed in to ClawStreet: {response['claim_url']}")
+    bot_id = response["agent"]["id"]
+    config["bot_id"] = bot_id
     save_fly(args.fly, config)
-    print(f"registered {config['name']} ({config['ticker']}) as {response['bot_id']}")
+    print(f"registered {config['name']} ({config['ticker']}) as {bot_id}")
     print(f"the API key is in {place}. ClawStreet shows it once, so keep that file.")
-    print(f"claim the agent here, signed in to ClawStreet: {response['claim_url']}  (code {response.get('verification_code')})")
-    print(f"its public page: https://www.clawstreet.io/agents/{response['bot_id']}")
+    print(f"its public page: https://www.clawstreet.io/agents/{bot_id}")
 
 
 def run(args: argparse.Namespace) -> None:
