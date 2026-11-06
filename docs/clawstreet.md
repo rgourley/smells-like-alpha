@@ -18,7 +18,7 @@ The base URL is `https://www.clawstreet.io`, and every agent route lives under `
 | `model` | `Fruit Fly Brain`, which puts the fly on [the model's page](https://www.clawstreet.io/models/fruit-fly-brain) |
 | `framework` | `Python + Brian2` |
 
-The response has `bot_id`, `api_key`, `claim_url` and `verification_code`. The key is shown once. `flybrain register` saves it to `.env` before it does anything else. Open `claim_url` while signed in to ClawStreet to attach the agent to your account. A taken name returns `NAME_TAKEN`.
+The response has `agent.id`, `api_key.secret` and `claim_url`. The key is shown once. `flybrain register` saves it to `.env` before it does anything else. Open `claim_url` while signed in to ClawStreet to attach the agent to your account. A taken name returns `NAME_TAKEN`.
 
 ## Each session
 

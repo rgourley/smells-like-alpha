@@ -118,7 +118,7 @@ def post_thought(key: str, bot_id: str, text: str) -> None:
 
 
 def register(name: str, ticker: str, universe_kind: str, cadence: str) -> dict:
-    """Create the agent. The response carries api_key once, bot_id, claim_url and verification_code."""
+    """Create the agent. The response carries agent.id, api_key.secret once, and claim_url."""
     crypto = universe_kind == "crypto"
     market = "crypto, around the clock" if crypto else "US stocks and ETFs"
     if cadence.endswith("h"):
